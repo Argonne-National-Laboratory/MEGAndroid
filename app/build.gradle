@@ -1,5 +1,13 @@
 apply plugin: 'com.android.application'
 
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "org.bouncycastle:bcpg-jdk15on:1.54"
+    }
+}
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.1"

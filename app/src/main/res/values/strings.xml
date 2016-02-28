@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">MEG</string>
-
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_installation">Installation</string>
     <string name="title_activity_login">Login</string>
     <string name="title_activity_advanced__options">Advanced_Options</string>
+    <string name="ok">OKAY</string>
+    <string name="install_alert_msg">This password will be your private key password. Do not share this with anyone.</string>
 </resources>
