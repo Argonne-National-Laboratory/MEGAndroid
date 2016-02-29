@@ -88,7 +88,12 @@ public class Installation extends AppCompatActivity
      * @return
      */
     private boolean validateDoesNotHaveKey() {
-        return false;
+        File keyFile = new File(this.getFilesDir(), Constants.SECRETKEY_FILENAME);
+        if (keyFile.exists()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private void writeKeyStrToFile(String key, String filename) throws IOException {
@@ -121,13 +126,29 @@ public class Installation extends AppCompatActivity
                     new JcePBESecretKeyEncryptorBuilder(PGPEncryptedData.CAST5, sha1Calc).
                             setProvider(Constants.SPONGY_CASTLE).build(password)
             );
-            writeKeyStrToFile(secretKey.toString(), "secret.gpg");
-            writeKeyStrToFile(pgpKeyPair.getPublicKey().toString(), "pubkey.pgp");
+            writeKeyStrToFile(secretKey.toString(), Constants.SECRETKEY_FILENAME);
+            writeKeyStrToFile(pgpKeyPair.getPublicKey().toString(), Constants.PUBLICKEY_FILENAME);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (NoSuchProviderException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Return AlertDialog to tell the user they already created their PGP key
+     *
+     * @return
+     */
+    private AlertDialog alreadyCreatedKeyBuilder() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.already_created_key_msg);
+        // TODO For now just have the user click ok but later we should
+        // TODO direct them to the revoke key flow if they forgot their password
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {}
+        });
+        return builder.create();
     }
 
     /**
@@ -179,6 +200,7 @@ public class Installation extends AppCompatActivity
                     if (validateDoesNotHaveKey()) {
                         // generate some kind of alert then break or go back to the
                         // main screen after user hits OK
+                        alreadyCreatedKeyBuilder().show();
                         break;
                     }
                     // Eventually we want to add form validation but not yet.
