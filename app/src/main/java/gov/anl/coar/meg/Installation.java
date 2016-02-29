@@ -14,6 +14,7 @@ import android.widget.EditText;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Date;
@@ -37,6 +38,7 @@ import org.spongycastle.openpgp.operator.jcajce.JcaPGPContentSignerBuilder;
 import org.spongycastle.openpgp.operator.jcajce.JcaPGPDigestCalculatorProviderBuilder;
 import org.spongycastle.openpgp.operator.jcajce.JcaPGPKeyPair;
 import org.spongycastle.openpgp.operator.jcajce.JcePBESecretKeyEncryptorBuilder;
+import org.spongycastle.util.encoders.Base64Encoder;
 
 import gov.anl.coar.meg.exception.InvalidKeyException;
 
@@ -96,11 +98,16 @@ public class Installation extends AppCompatActivity
         }
     }
 
-    private void writeKeyStrToFile(String key, String filename) throws IOException {
-        File keyFile = new File(this.getFilesDir(), filename);
-        BufferedWriter output = new BufferedWriter(new FileWriter(keyFile));
-        output.write(key);
-        output.close();
+    private void writeKeysToFile(PGPSecretKey secretKey, PGPPublicKey pubKey)
+            throws IOException {
+        File secretKeyFile = new File(this.getFilesDir(), Constants.SECRETKEY_FILENAME);
+        FileOutputStream secKeyOutput = new FileOutputStream(secretKeyFile);
+        secretKey.encode(secKeyOutput);
+        secKeyOutput.close();
+        File publicKeyFile = new File(this.getFilesDir(), Constants.PUBLICKEY_FILENAME);
+        FileOutputStream pubKeyOutput = new FileOutputStream(publicKeyFile);
+        pubKey.encode(pubKeyOutput);
+        pubKeyOutput.close();
     }
 
     private void generateRSAKey(String firstName, String lastName, String email, char[] password)
@@ -126,8 +133,7 @@ public class Installation extends AppCompatActivity
                     new JcePBESecretKeyEncryptorBuilder(PGPEncryptedData.CAST5, sha1Calc).
                             setProvider(Constants.SPONGY_CASTLE).build(password)
             );
-            writeKeyStrToFile(secretKey.toString(), Constants.SECRETKEY_FILENAME);
-            writeKeyStrToFile(pgpKeyPair.getPublicKey().toString(), Constants.PUBLICKEY_FILENAME);
+            writeKeysToFile(secretKey, pgpKeyPair.getPublicKey());
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (NoSuchProviderException e) {

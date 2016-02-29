@@ -17,64 +17,64 @@ import android.widget.Button;
 public class MainActivity extends AppCompatActivity
     implements View.OnClickListener{
 
-  Button bInstall;
-  Button bLogin;
+    Button bInstall;
+    Button bLogin;
 
-	/**	Instantiate bInstall and bLogin buttons
-	 *
-	 * 	@author Bridget Basan
-	 */
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_main);
+    /**	Instantiate bInstall and bLogin buttons
+     *
+     * 	@author Bridget Basan
+     */
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-    bInstall = (Button) findViewById(R.id.bInstall);
-    bInstall.setOnClickListener(this);
+        bInstall = (Button) findViewById(R.id.bInstall);
+        bInstall.setOnClickListener(this);
 
-    bLogin = (Button) findViewById(R.id.bLogin);
-    bLogin.setOnClickListener(this);
-  }
-
-	/** Instantiate new intents on button clicks
-	 *
-	 * @author Bridget Basan
-	 */
-  @Override
-  public void onClick(View v) {
-    switch(v.getId()){
-      case R.id.bInstall:
-        startActivity(new Intent(this,Installation.class));
-        break;
-      case R.id.bLogin:
-        startActivity(new Intent(this,Login.class));
-        break;
-			default:
-				break;
+        bLogin = (Button) findViewById(R.id.bLogin);
+        bLogin.setOnClickListener(this);
     }
-  }
 
-	/** Default method */
-	@Override
-  public boolean onCreateOptionsMenu(Menu menu) {
-    // Inflate the menu; this adds items to the action bar if it is present.
-    getMenuInflater().inflate(R.menu.menu_main, menu);
-    return true;
-  }
-
-	/** Default method */
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    // Handle action bar item clicks here. The action bar will
-    // automatically handle clicks on the Home/Up button, so long
-    // as you specify a parent activity in AndroidManifest.xml.
-    int id = item.getItemId();
-
-    //noinspection SimplifiableIfStatement
-    if (id == R.id.action_settings) {
-      return true;
+    /** Instantiate new intents on button clicks
+     *
+     * @author Bridget Basan
+     */
+    @Override
+    public void onClick(View v) {
+        switch(v.getId()){
+            case R.id.bInstall:
+                startActivity(new Intent(this,Installation.class));
+                break;
+            case R.id.bLogin:
+                startActivity(new Intent(this,Login.class));
+                break;
+            default:
+                break;
+        }
     }
-    return super.onOptionsItemSelected(item);
-  }
+
+    /** Default method */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    /** Default method */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+             return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
 }
