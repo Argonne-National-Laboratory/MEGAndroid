@@ -12,10 +12,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Date;
 import java.security.KeyPair;
@@ -38,8 +36,8 @@ import org.spongycastle.openpgp.operator.jcajce.JcaPGPContentSignerBuilder;
 import org.spongycastle.openpgp.operator.jcajce.JcaPGPDigestCalculatorProviderBuilder;
 import org.spongycastle.openpgp.operator.jcajce.JcaPGPKeyPair;
 import org.spongycastle.openpgp.operator.jcajce.JcePBESecretKeyEncryptorBuilder;
-import org.spongycastle.util.encoders.Base64Encoder;
 
+import gov.anl.coar.meg.Util;
 import gov.anl.coar.meg.exception.InvalidKeyException;
 
 /** Class to provide functionality to the installation page of MEG
@@ -77,21 +75,6 @@ public class Installation extends AppCompatActivity
         etEmail = (EditText) findViewById(R.id.etEmail);
         etPassword = (EditText) findViewById(R.id.etPassword);
         etPhone = (EditText) findViewById(R.id.etPhone);
-    }
-
-    /**
-     * Ensure that the user does not already have a public/private
-     * key pair on the phone already
-     *
-     * @return
-     */
-    private boolean validateDoesNotHaveKey() {
-        File keyFile = new File(this.getFilesDir(), Constants.SECRETKEY_FILENAME);
-        if (keyFile.exists()) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
     private void writeKeysToFile(PGPSecretKey secretKey, PGPPublicKey pubKey)
@@ -197,7 +180,7 @@ public class Installation extends AppCompatActivity
             // Eventually we want to re-add the advanced options button but not now
             case R.id.bNext: {
                 try {
-                    if (validateDoesNotHaveKey()) {
+                    if (new Util().validateDoesNotHaveKey(this)) {
                         // generate some kind of alert then break or go back to the
                         // main screen after user hits OK
                         alreadyCreatedKeyBuilder().show();

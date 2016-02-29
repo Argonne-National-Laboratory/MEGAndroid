@@ -1,5 +1,6 @@
 package gov.anl.coar.meg;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -36,9 +37,13 @@ public class MainActivity extends AppCompatActivity
         bLogin.setOnClickListener(this);
     }
 
+    private AlertDialog passwordDialogBuilder() {
+
+    }
     /** Instantiate new intents on button clicks
      *
      * @author Bridget Basan
+     * @author Greg Rehm
      */
     @Override
     public void onClick(View v) {
@@ -47,7 +52,12 @@ public class MainActivity extends AppCompatActivity
                 startActivity(new Intent(this,Installation.class));
                 break;
             case R.id.bLogin:
-                startActivity(new Intent(this,Login.class));
+                if (!new Util().validateDoesNotHaveKey(this)) {
+                    bLogin.setError(Constants.LOGIN_BUT_NO_KEY);
+                    break;
+                } else {
+                    startActivity(new Intent(this, Login.class));
+                }
                 break;
             default:
                 break;

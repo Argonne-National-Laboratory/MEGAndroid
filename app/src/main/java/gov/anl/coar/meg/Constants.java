@@ -10,4 +10,6 @@ public class Constants {
     // Eh... we can make it sound less like SSH in the future
     public static final String SECRETKEY_FILENAME = "id_rsa";
     public static final String PUBLICKEY_FILENAME = "id_rsa.pub";
+    public static final String LOGIN_BUT_NO_KEY =
+            "It seems like you still need to complete the MEG installation step";
 }
