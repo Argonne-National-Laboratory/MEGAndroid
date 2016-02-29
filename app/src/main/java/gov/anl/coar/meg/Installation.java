@@ -51,7 +51,6 @@ import gov.anl.coar.meg.exception.InvalidKeyException;
 public class Installation extends AppCompatActivity
     implements View.OnClickListener {
 
-    Button bAdvanced;
     Button bNext;
     EditText etFirstName;
     EditText etLastName;
@@ -60,7 +59,7 @@ public class Installation extends AppCompatActivity
     EditText etPhone;
 
     /**
-     * Instantiate bAdvanced button
+     * Instantiate the screen
      *
      * @author Bridget Basan
      * @author Greg Rehm
@@ -69,9 +68,6 @@ public class Installation extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_installation);
-
-        bAdvanced = (Button) findViewById(R.id.bAdvanced);
-        bAdvanced.setOnClickListener(this);
 
         bNext = (Button) findViewById(R.id.bNext);
         bNext.setOnClickListener(this);
@@ -198,9 +194,7 @@ public class Installation extends AppCompatActivity
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.bAdvanced: {
-                startActivity(new Intent(this, Advanced_Options.class));
-            }
+            // Eventually we want to re-add the advanced options button but not now
             case R.id.bNext: {
                 try {
                     if (validateDoesNotHaveKey()) {
@@ -231,7 +225,6 @@ public class Installation extends AppCompatActivity
                     somethingWrongAlertBuilder().show();
                     e.printStackTrace();
                     return;
-
                 }
             }
         }
