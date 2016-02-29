@@ -6,4 +6,5 @@
     <string name="title_activity_advanced__options">Advanced_Options</string>
     <string name="ok">OKAY</string>
     <string name="install_alert_msg">This password will be your private key password. Do not share this with anyone.</string>
+    <string name="something_wrong_pgp_msg">Something went wrong when creating your PGP key. Try again.</string>
 </resources>
