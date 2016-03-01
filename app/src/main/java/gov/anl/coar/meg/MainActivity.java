@@ -37,9 +37,6 @@ public class MainActivity extends AppCompatActivity
         bLogin.setOnClickListener(this);
     }
 
-    private AlertDialog passwordDialogBuilder() {
-
-    }
     /** Instantiate new intents on button clicks
      *
      * @author Bridget Basan
