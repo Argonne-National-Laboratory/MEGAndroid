@@ -14,6 +14,7 @@ import android.widget.Button;
  * Adds functionality to buttons which open new intents
  *
  * @author Bridget Basan
+ * @author Greg Rehm
  */
 public class MainActivity extends AppCompatActivity
     implements View.OnClickListener{
@@ -49,7 +50,7 @@ public class MainActivity extends AppCompatActivity
                 startActivity(new Intent(this,Installation.class));
                 break;
             case R.id.bLogin:
-                if (!new Util().validateDoesNotHaveKey(this)) {
+                if (!new Util().doesSecretKeyExist(this)) {
                     bLogin.setError(Constants.LOGIN_BUT_NO_KEY);
                     break;
                 } else {

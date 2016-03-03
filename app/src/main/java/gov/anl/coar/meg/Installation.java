@@ -89,7 +89,7 @@ public class Installation extends AppCompatActivity
         pubKeyOutput.close();
     }
 
-    private void generateRSAKey(String firstName, String lastName, String email, char[] password)
+    public void generateRSAKey(String firstName, String lastName, String email, char[] password)
             throws InvalidKeyException, PGPException, IOException {
         try {
             Security.addProvider(new BouncyCastleProvider());
@@ -180,7 +180,7 @@ public class Installation extends AppCompatActivity
             // Eventually we want to re-add the advanced options button but not now
             case R.id.bNext: {
                 try {
-                    if (new Util().validateDoesNotHaveKey(this)) {
+                    if (new Util().doesSecretKeyExist(this)) {
                         // generate some kind of alert then break or go back to the
                         // main screen after user hits OK
                         alreadyCreatedKeyBuilder().show();
