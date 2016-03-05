@@ -12,4 +12,6 @@ public class Constants {
     public static final String PUBLICKEY_FILENAME = "id_rsa.pub";
     public static final String LOGIN_BUT_NO_KEY =
             "It seems like you still need to complete the MEG installation step";
+    // Obviously this will change in the future
+    public static final String MEG_API_URL = "http://grehm.us/megserver";
 }
