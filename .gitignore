@@ -30,3 +30,4 @@ captures/
 .navigation/
 *.iml
 *.idea
+*.DS_Store

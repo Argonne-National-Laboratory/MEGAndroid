@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 import gov.anl.coar.meg.Constants;
 import gov.anl.coar.meg.R;
 import gov.anl.coar.meg.Util;
-import gov.anl.coar.meg.exception.NoInstanceIdException;
 
 /**
  * Created by greg on 3/5/16.
@@ -28,7 +27,7 @@ public class GCMInstanceIdIntentService extends IntentService{
         super(TAG);
     }
 
-    protected void retryHandler(Intent intent) {
+    protected void retryGetInstanceId(Intent intent) {
         Log.i(TAG, "Failed to get instance id. Retrying");
         try {
             TimeUnit.SECONDS.sleep(Constants.INSTANCE_ID_RETRY_TIMEOUT);
@@ -46,9 +45,7 @@ public class GCMInstanceIdIntentService extends IntentService{
         try {
             String phoneNumber = Util.getPhoneNumber(this);
             // This is essentially a hasRegistered check
-            if (phoneNumber == null) {
-                retryHandler(intent);
-            }
+            if (phoneNumber == null) {retryGetInstanceId(intent);}
             InstanceID instanceID = InstanceID.getInstance(this);
             String token = instanceID.getToken(getString(R.string.gcm_defaultSenderId),
                     GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
@@ -56,29 +53,31 @@ public class GCMInstanceIdIntentService extends IntentService{
             Log.d(TAG, "Received token " + token);
             sendTokenToServer(token, phoneNumber);
             // no subscription to topics is necessary.
-        } catch (NoInstanceIdException e) {
-            // For now I'm not sure how to handle this. So don't bother. Just
-            // pring the stack.
-            Log.i(TAG, e.getMessage());
-            e.printStackTrace();
-            retryHandler(intent);
         } catch (Exception e) {
             // Example code stresses that some signal is sent so that we can attempt
             // this step at a later time. Why not just re-call directly with some
             // exponential backoff? Anyhow for now just leave blank.
             e.printStackTrace();
-            retryHandler(intent);
+            retryGetInstanceId(intent);
         }
     }
 
-    public void sendTokenToServer(String token, String phoneNumber) throws NoInstanceIdException{
-        String url = Constants.MEG_API_URL + INSTANCE_ID_API_ROUTE;
-        Map<String, String> data = new HashMap<String, String>();
-        data.put("gcm_instance_id", token);
-        data.put("phone_number", phoneNumber);
-        HttpRequest response = HttpRequest.put(url).form(data);
-        if (response.code() != 200) {
-            throw new NoInstanceIdException(response);
+    public void sendTokenToServer(String token, String phoneNumber) {
+        try {
+            int code = 0;
+            String url = Constants.MEG_API_URL + INSTANCE_ID_API_ROUTE;
+            Map<String, String> data = new HashMap<String, String>();
+            data.put("gcm_instance_id", token);
+            data.put("phone_number", phoneNumber);
+            while (code != 200) {
+                HttpRequest response = HttpRequest.put(url).form(data);
+                code = response.code();
+                Log.d(TAG, "Received code " + code + " from server with url: " + url);
+                TimeUnit.SECONDS.sleep(Constants.INSTANCE_ID_RETRY_TIMEOUT);
+            }
+        } catch (InterruptedException e) {
+            // handle later
+            e.printStackTrace();
         }
     }
 }
