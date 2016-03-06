@@ -30,17 +30,22 @@ public class GCMInstanceIdIntentService extends IntentService{
     @Override
     protected void onHandleIntent(Intent intent) {
         try {
+            String phoneNumber = Util.getPhoneNumber(this);
+            // This is essentially a hasRegistered check
+            if (phoneNumber == null) {
+                return;
+            }
             InstanceID instanceID = InstanceID.getInstance(this);
             String token = instanceID.getToken(getString(R.string.gcm_defaultSenderId),
                     GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
             // send the token to the server for storage
             Log.d(TAG, "Received token " + token);
-            String phoneNumber = new Util().getPhoneNumber(this);
             sendTokenToServer(token, phoneNumber);
             // no subscription to topics is necessary.
         } catch (NoInstanceIdException e) {
             // For now I'm not sure how to handle this. So don't bother. Just
             // pring the stack.
+            Log.i(TAG, e.getMessage());
             e.printStackTrace();
         } catch (Exception e) {
             // Example code stresses that some signal is sent so that we can attempt

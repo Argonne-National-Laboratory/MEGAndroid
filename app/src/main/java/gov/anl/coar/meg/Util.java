@@ -11,6 +11,8 @@ import java.io.IOException;
 
 /**
  * Created by greg on 2/29/16.
+ *
+ * I dunno, is it worth making all the methods here static? For now punt.
  */
 public class Util {
     /**
@@ -27,7 +29,7 @@ public class Util {
         }
     }
 
-    public String getPhoneNumber(Context context) {
+    public static String getPhoneNumber(Context context) {
         // I imagine theres a case where the phone number is null. We can probably
         // ignore this for now though
         try {
@@ -43,5 +45,6 @@ public class Util {
             // one line of text. Not much reason to overthink this atm.
             e.printStackTrace();
         }
+        return null;
     }
 }
