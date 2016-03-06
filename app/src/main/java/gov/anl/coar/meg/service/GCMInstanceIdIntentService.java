@@ -10,6 +10,7 @@ import com.google.android.gms.iid.InstanceID;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import gov.anl.coar.meg.Constants;
 import gov.anl.coar.meg.R;
@@ -27,13 +28,26 @@ public class GCMInstanceIdIntentService extends IntentService{
         super(TAG);
     }
 
+    protected void retryHandler(Intent intent) {
+        Log.i(TAG, "Failed to get instance id. Retrying");
+        try {
+            TimeUnit.SECONDS.sleep(Constants.INSTANCE_ID_RETRY_TIME);
+            onHandleIntent(intent);
+        } catch (InterruptedException e) {
+            // This shouldn't happen. But I imagine that it could happen as a result
+            // of some crash on android. Either way I'm pretty sure we have bigger
+            // problems if this goes down
+            e.printStackTrace();
+        }
+    }
+
     @Override
     protected void onHandleIntent(Intent intent) {
         try {
             String phoneNumber = Util.getPhoneNumber(this);
             // This is essentially a hasRegistered check
             if (phoneNumber == null) {
-                return;
+                retryHandler(intent);
             }
             InstanceID instanceID = InstanceID.getInstance(this);
             String token = instanceID.getToken(getString(R.string.gcm_defaultSenderId),
@@ -47,11 +61,13 @@ public class GCMInstanceIdIntentService extends IntentService{
             // pring the stack.
             Log.i(TAG, e.getMessage());
             e.printStackTrace();
+            retryHandler(intent);
         } catch (Exception e) {
             // Example code stresses that some signal is sent so that we can attempt
             // this step at a later time. Why not just re-call directly with some
             // exponential backoff? Anyhow for now just leave blank.
             e.printStackTrace();
+            retryHandler(intent);
         }
     }
 
