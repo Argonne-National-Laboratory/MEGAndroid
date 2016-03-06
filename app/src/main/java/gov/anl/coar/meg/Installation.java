@@ -13,8 +13,10 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Date;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -37,7 +39,6 @@ import org.spongycastle.openpgp.operator.jcajce.JcaPGPDigestCalculatorProviderBu
 import org.spongycastle.openpgp.operator.jcajce.JcaPGPKeyPair;
 import org.spongycastle.openpgp.operator.jcajce.JcePBESecretKeyEncryptorBuilder;
 
-import gov.anl.coar.meg.Util;
 import gov.anl.coar.meg.exception.InvalidKeyException;
 
 /** Class to provide functionality to the installation page of MEG
@@ -87,6 +88,18 @@ public class Installation extends AppCompatActivity
         FileOutputStream pubKeyOutput = new FileOutputStream(publicKeyFile);
         pubKey.encode(pubKeyOutput);
         pubKeyOutput.close();
+    }
+
+    public void writePhoneNumberToFile(String phoneNumber) {
+        try {
+            File phoneNumberFile = new File(this.getFilesDir(), Constants.PHONENUMBER_FILENAME);
+            PrintWriter output = new PrintWriter(phoneNumberFile);
+            output.write(phoneNumber);
+            output.close();
+        } catch (FileNotFoundException e) {
+            // Once again kick handling this down the line
+            e.printStackTrace();
+        }
     }
 
     public void generateRSAKey(String firstName, String lastName, String email, char[] password)
@@ -191,7 +204,9 @@ public class Installation extends AppCompatActivity
                     String firstName = etFirstName.getText().toString();
                     String lastName = etLastName.getText().toString();
                     String email = etEmail.getText().toString();
+                    String phoneNumber = etPhone.getText().toString();
                     char[] password = etPassword.getText().toString().toCharArray();
+                    writePhoneNumberToFile(phoneNumber);
                     generateRSAKey(firstName, lastName, email, password);
                     passwordConfirmBuilder().show();
                 } catch (InvalidKeyException e) {
