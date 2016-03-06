@@ -15,5 +15,6 @@ public class Constants {
             "It seems like you still need to complete the MEG installation step";
     // Obviously this will change in the future
     public static final String MEG_API_URL = "http://grehm.us/megserver";
-    public static final long INSTANCE_ID_RETRY_TIME = 5;
+    public static final long INSTANCE_ID_RETRY_TIMEOUT = 5;
+    public static final long MESSAGE_RETRIEVAL_TIMEOUT = 2;
 }

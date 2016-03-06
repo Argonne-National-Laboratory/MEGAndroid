@@ -31,7 +31,7 @@ public class GCMInstanceIdIntentService extends IntentService{
     protected void retryHandler(Intent intent) {
         Log.i(TAG, "Failed to get instance id. Retrying");
         try {
-            TimeUnit.SECONDS.sleep(Constants.INSTANCE_ID_RETRY_TIME);
+            TimeUnit.SECONDS.sleep(Constants.INSTANCE_ID_RETRY_TIMEOUT);
             onHandleIntent(intent);
         } catch (InterruptedException e) {
             // This shouldn't happen. But I imagine that it could happen as a result
