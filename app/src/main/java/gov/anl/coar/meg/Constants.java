@@ -17,4 +17,5 @@ public class Constants {
     public static final String MEG_API_URL = "http://grehm.us/megserver";
     public static final long INSTANCE_ID_RETRY_TIMEOUT = 5;
     public static final long MESSAGE_RETRIEVAL_TIMEOUT = 2;
+    public static final String EMAIL_FILENAME = "email.txt";
 }

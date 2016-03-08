@@ -18,7 +18,7 @@ dependencies {
 android {
     signingConfigs {
         debug {
-            keyAlias 'android'
+            keyAlias 'androiddebugkey'
             keyPassword 'android'
             storeFile file('/Users/greg/.android/debug.keystore')
             storePassword 'android'

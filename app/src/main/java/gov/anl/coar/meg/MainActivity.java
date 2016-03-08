@@ -1,7 +1,7 @@
 package gov.anl.coar.meg;
 
-import android.app.AlertDialog;
 import android.content.Intent;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,6 +13,11 @@ import android.widget.Button;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
+import java.util.concurrent.TimeUnit;
+
+import gov.anl.coar.meg.receiver.GCMInstanceIdResultReceiver;
+import gov.anl.coar.meg.receiver.GCMInstanceIdResultReceiver.Receiver;
+import gov.anl.coar.meg.receiver.ReceiverCode;
 import gov.anl.coar.meg.service.GCMInstanceIdIntentService;
 
 
@@ -23,7 +28,7 @@ import gov.anl.coar.meg.service.GCMInstanceIdIntentService;
  * @author Greg Rehm
  */
 public class MainActivity extends AppCompatActivity
-    implements View.OnClickListener{
+    implements View.OnClickListener, Receiver{
 
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private static final String TAG = "MainActivity";
@@ -31,6 +36,8 @@ public class MainActivity extends AppCompatActivity
     Button bInstall;
     Button bLogin;
     Intent mInstanceIdIntent;
+
+    public GCMInstanceIdResultReceiver mReceiver;
     /**	Instantiate bInstall and bLogin buttons
      *
      * 	@author Bridget Basan
@@ -48,7 +55,10 @@ public class MainActivity extends AppCompatActivity
         bLogin.setOnClickListener(this);
 
         if (checkPlayServices()) {
+            mReceiver = new GCMInstanceIdResultReceiver(new Handler());
+            mReceiver.setReceiver(this);
             mInstanceIdIntent = new Intent(this, GCMInstanceIdIntentService.class);
+            mInstanceIdIntent.putExtra("receiver", mReceiver);
             startService(mInstanceIdIntent);
         }
     }
@@ -114,5 +124,15 @@ public class MainActivity extends AppCompatActivity
             return false;
         }
         return true;
+    }
+
+    @Override
+    public void onReceiveResult(int resultCode, Bundle resultData) {
+        Log.d(TAG, "received result " + resultCode + " from " + GCMInstanceIdIntentService.class.toString());
+        // We can add more fine grained handling of the error types later.
+        if (resultCode != ReceiverCode.IID_CODE_SUCCESS)
+            startService(mInstanceIdIntent);
+        else
+            stopService(mInstanceIdIntent);
     }
 }

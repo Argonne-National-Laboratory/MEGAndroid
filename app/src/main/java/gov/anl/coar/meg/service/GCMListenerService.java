@@ -16,8 +16,8 @@ import gov.anl.coar.meg.logic.PrivacyLogic;
  */
 public class GCMListenerService extends GcmListenerService{
     private static final String TAG = "GCMListenerService";
-    private static final String RETRIEVE_MSG_URL = "/get_message/";
-    private static final String SEND_MSG_URL = "/send_message/";
+    private static final String RETRIEVE_MSG_URL = "/encrypted_message/";
+    private static final String SEND_MSG_URL = "/decrypted_message/";
     private static final int MAX_RETRIES = 100;
 
     @Override

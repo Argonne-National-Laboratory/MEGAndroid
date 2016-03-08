@@ -90,11 +90,11 @@ public class Installation extends AppCompatActivity
         pubKeyOutput.close();
     }
 
-    public void writePhoneNumberToFile(String phoneNumber) {
+    public void writeConfigVarToFile(String filename, String item) {
         try {
-            File phoneNumberFile = new File(this.getFilesDir(), Constants.PHONENUMBER_FILENAME);
-            PrintWriter output = new PrintWriter(phoneNumberFile);
-            output.write(phoneNumber);
+            File varFile = new File(this.getFilesDir(), filename);
+            PrintWriter output = new PrintWriter(varFile);
+            output.write(item);
             output.close();
         } catch (FileNotFoundException e) {
             // Once again kick handling this down the line
@@ -206,7 +206,8 @@ public class Installation extends AppCompatActivity
                     String email = etEmail.getText().toString();
                     String phoneNumber = etPhone.getText().toString();
                     char[] password = etPassword.getText().toString().toCharArray();
-                    writePhoneNumberToFile(phoneNumber);
+                    writeConfigVarToFile(Constants.PHONENUMBER_FILENAME, phoneNumber);
+                    writeConfigVarToFile(Constants.EMAIL_FILENAME, email);
                     generateRSAKey(firstName, lastName, email, password);
                     passwordConfirmBuilder().show();
                 } catch (InvalidKeyException e) {
