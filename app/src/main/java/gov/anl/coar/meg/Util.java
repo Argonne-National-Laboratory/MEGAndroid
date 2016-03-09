@@ -12,7 +12,7 @@ import java.io.IOException;
 /**
  * Created by greg on 2/29/16.
  *
- * I dunno, is it worth making all the methods here static? For now punt.
+ * Move to util package
  */
 public class Util {
     /**

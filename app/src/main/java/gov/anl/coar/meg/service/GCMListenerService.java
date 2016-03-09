@@ -9,7 +9,7 @@ import com.google.android.gms.gcm.GcmListenerService;
 import java.io.BufferedInputStream;
 
 import gov.anl.coar.meg.Constants;
-import gov.anl.coar.meg.logic.PrivacyLogic;
+import gov.anl.coar.meg.logic.EncryptionLogic;
 
 /**
  * Created by greg on 3/6/16.
@@ -32,9 +32,9 @@ public class GCMListenerService extends GcmListenerService{
             // Somehow I need to get the pk password. Crud... can I encrypt it
             // with the symmetric key??
             BufferedInputStream decryptedInBuffer =
-                    PrivacyLogic.decryptMessageWithPK(responseBuffer);
+                    EncryptionLogic.decryptMessageWithPK(responseBuffer);
             BufferedInputStream symInBuffer =
-                    PrivacyLogic.encryptMessageWithSymKey(decryptedInBuffer);
+                    EncryptionLogic.encryptMessageWithSymKey(decryptedInBuffer);
             // I'm sure I need to add headers or something. For now don't do anything
             // else. I'm good with just stubbing out the code
             HttpRequest.post(Constants.MEG_API_URL + SEND_MSG_URL).send(symInBuffer);

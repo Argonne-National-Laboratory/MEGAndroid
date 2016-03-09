@@ -5,7 +5,7 @@ import java.io.BufferedInputStream;
 /**
  * Created by greg on 3/6/16.
  */
-public class PrivacyLogic {
+public class EncryptionLogic {
     public static BufferedInputStream decryptMessageWithPK(BufferedInputStream buffer) {
         // just a stub for now
         return buffer;
