@@ -29,7 +29,8 @@ public class GCMListenerService extends GcmListenerService{
             HttpRequest response = retrieveEncryptedMessage(messageId, 0);
             // get message, decrypt, then re-encrypt with symmetric key
             BufferedInputStream responseBuffer = response.buffer();
-            // Somehow I need to get the password. Crud...
+            // Somehow I need to get the pk password. Crud... can I encrypt it
+            // with the symmetric key??
             BufferedInputStream decryptedInBuffer =
                     PrivacyLogic.decryptMessageWithPK(responseBuffer);
             BufferedInputStream symInBuffer =

@@ -44,9 +44,16 @@
             </intent-filter>
         </receiver>
         <service
-            android:name=".service.GCMInstanceIdIntentService"
+            android:name=".service.GCMInstanceIdRegistrationService"
             android:exported="false"
             />
+        <service
+            android:name=".service.GCMInstanceIdListenerService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.android.gms.iid.InstanceId" />
+            </intent-filter>
+        </service>
         <service
             android:name=".service.GCMListenerService"
             android:exported="false">

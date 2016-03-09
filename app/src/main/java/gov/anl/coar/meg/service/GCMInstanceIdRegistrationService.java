@@ -22,12 +22,12 @@ import gov.anl.coar.meg.receiver.ReceiverCode;
 /**
  * Created by greg on 3/5/16.
  */
-public class GCMInstanceIdIntentService extends IntentService{
+public class GCMInstanceIdRegistrationService extends IntentService{
 
     private static final String STORE_INSTANCE_ID_API_ROUTE = "/gcm_instance_id/";
     private static final String TAG = "InstanceIdIntentService";
 
-    public GCMInstanceIdIntentService() {
+    public GCMInstanceIdRegistrationService() {
         super(TAG);
     }
 

@@ -13,12 +13,10 @@ import android.widget.Button;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
-import java.util.concurrent.TimeUnit;
-
 import gov.anl.coar.meg.receiver.GCMInstanceIdResultReceiver;
 import gov.anl.coar.meg.receiver.GCMInstanceIdResultReceiver.Receiver;
 import gov.anl.coar.meg.receiver.ReceiverCode;
-import gov.anl.coar.meg.service.GCMInstanceIdIntentService;
+import gov.anl.coar.meg.service.GCMInstanceIdRegistrationService;
 
 
 /** Class to provide functionality to the opening welcome page of MEG
@@ -36,8 +34,8 @@ public class MainActivity extends AppCompatActivity
     Button bInstall;
     Button bLogin;
     Intent mInstanceIdIntent;
+    GCMInstanceIdResultReceiver mReceiver;
 
-    public GCMInstanceIdResultReceiver mReceiver;
     /**	Instantiate bInstall and bLogin buttons
      *
      * 	@author Bridget Basan
@@ -57,7 +55,7 @@ public class MainActivity extends AppCompatActivity
         if (checkPlayServices()) {
             mReceiver = new GCMInstanceIdResultReceiver(new Handler());
             mReceiver.setReceiver(this);
-            mInstanceIdIntent = new Intent(this, GCMInstanceIdIntentService.class);
+            mInstanceIdIntent = new Intent(this, GCMInstanceIdRegistrationService.class);
             mInstanceIdIntent.putExtra("receiver", mReceiver);
             startService(mInstanceIdIntent);
         }
@@ -128,7 +126,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData) {
-        Log.d(TAG, "received result " + resultCode + " from " + GCMInstanceIdIntentService.class.toString());
+        Log.d(TAG, "received result " + resultCode + " from " + GCMInstanceIdRegistrationService.class.toString());
         // We can add more fine grained handling of the error types later.
         if (resultCode != ReceiverCode.IID_CODE_SUCCESS)
             startService(mInstanceIdIntent);
