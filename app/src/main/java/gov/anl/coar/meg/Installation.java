@@ -14,32 +14,12 @@ import android.widget.EditText;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Date;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SecureRandom;
-import java.security.Security;
-
-import org.spongycastle.bcpg.HashAlgorithmTags;
-import org.spongycastle.jce.provider.BouncyCastleProvider;
-import org.spongycastle.openpgp.PGPEncryptedData;
 import org.spongycastle.openpgp.PGPException;
-import org.spongycastle.openpgp.PGPKeyPair;
-import org.spongycastle.openpgp.PGPPublicKey;
-import org.spongycastle.openpgp.PGPSecretKey;
-import org.spongycastle.openpgp.PGPSignature;
-import org.spongycastle.openpgp.operator.PGPDigestCalculator;
-import org.spongycastle.openpgp.operator.jcajce.JcaPGPContentSignerBuilder;
-import org.spongycastle.openpgp.operator.jcajce.JcaPGPDigestCalculatorProviderBuilder;
-import org.spongycastle.openpgp.operator.jcajce.JcaPGPKeyPair;
-import org.spongycastle.openpgp.operator.jcajce.JcePBESecretKeyEncryptorBuilder;
 
 import gov.anl.coar.meg.exception.InvalidKeyException;
+import gov.anl.coar.meg.pgp.KeyGenerationLogic;
 
 /** Class to provide functionality to the installation page of MEG
  * Adds functionality to buttons which open new intents
@@ -78,18 +58,6 @@ public class Installation extends AppCompatActivity
         etPhone = (EditText) findViewById(R.id.etPhone);
     }
 
-    private void writeKeysToFile(PGPSecretKey secretKey, PGPPublicKey pubKey)
-            throws IOException {
-        File secretKeyFile = new File(this.getFilesDir(), Constants.SECRETKEY_FILENAME);
-        FileOutputStream secKeyOutput = new FileOutputStream(secretKeyFile);
-        secretKey.encode(secKeyOutput);
-        secKeyOutput.close();
-        File publicKeyFile = new File(this.getFilesDir(), Constants.PUBLICKEY_FILENAME);
-        FileOutputStream pubKeyOutput = new FileOutputStream(publicKeyFile);
-        pubKey.encode(pubKeyOutput);
-        pubKeyOutput.close();
-    }
-
     public void writeConfigVarToFile(String filename, String item) {
         try {
             File varFile = new File(this.getFilesDir(), filename);
@@ -98,37 +66,6 @@ public class Installation extends AppCompatActivity
             output.close();
         } catch (FileNotFoundException e) {
             // Once again kick handling this down the line
-            e.printStackTrace();
-        }
-    }
-
-    public void generateRSAKey(String firstName, String lastName, String email, char[] password)
-            throws InvalidKeyException, PGPException, IOException {
-        try {
-            Security.addProvider(new BouncyCastleProvider());
-            // Make the algorithm configurable in the future
-            KeyPairGenerator kpg = KeyPairGenerator.getInstance(Constants.RSA, Constants.SPONGY_CASTLE);
-            // Probably can make number of bytes configurable in the futue
-            kpg.initialize(Constants.ENCRYPTION_BITS, new SecureRandom());
-            KeyPair keyPair = kpg.generateKeyPair();
-            if (keyPair == null) {
-                throw new InvalidKeyException();
-            }
-            PGPDigestCalculator sha1Calc = new JcaPGPDigestCalculatorProviderBuilder()
-                    .build().get(HashAlgorithmTags.SHA1);
-            PGPKeyPair pgpKeyPair = new JcaPGPKeyPair(PGPPublicKey.RSA_GENERAL, keyPair, new Date());
-            String identity = firstName + " " + lastName + " " + email;
-            //CAST5 is 128 bit cipher. CAST6 is 256 bits
-            PGPSecretKey secretKey = new PGPSecretKey(
-                    PGPSignature.DEFAULT_CERTIFICATION, pgpKeyPair, identity, sha1Calc, null, null,
-                    new JcaPGPContentSignerBuilder(pgpKeyPair.getPublicKey().getAlgorithm(), HashAlgorithmTags.SHA256),
-                    new JcePBESecretKeyEncryptorBuilder(PGPEncryptedData.CAST5, sha1Calc).
-                            setProvider(Constants.SPONGY_CASTLE).build(password)
-            );
-            writeKeysToFile(secretKey, pgpKeyPair.getPublicKey());
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (NoSuchProviderException e) {
             e.printStackTrace();
         }
     }
@@ -208,7 +145,7 @@ public class Installation extends AppCompatActivity
                     char[] password = etPassword.getText().toString().toCharArray();
                     writeConfigVarToFile(Constants.PHONENUMBER_FILENAME, phoneNumber);
                     writeConfigVarToFile(Constants.EMAIL_FILENAME, email);
-                    generateRSAKey(firstName, lastName, email, password);
+                    new KeyGenerationLogic().generateNewKeyRingAndKeys(this, firstName, lastName, email, password);
                     passwordConfirmBuilder().show();
                 } catch (InvalidKeyException e) {
                     // Something went wrong don't know what and I need to

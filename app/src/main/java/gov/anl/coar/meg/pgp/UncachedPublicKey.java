@@ -25,7 +25,6 @@ import org.spongycastle.bcpg.SignatureSubpacketTags;
 import org.spongycastle.openpgp.PGPPublicKey;
 import org.spongycastle.openpgp.PGPSignature;
 import org.spongycastle.openpgp.PGPSignatureSubpacketVector;
-import org.spongycastle.openpgp.PGPUserAttributeSubpacketVector;
 import org.spongycastle.openpgp.operator.jcajce.JcaPGPContentVerifierBuilderProvider;
 import gov.anl.coar.meg.Constants;
 import gov.anl.coar.meg.util.IterableIterator;
