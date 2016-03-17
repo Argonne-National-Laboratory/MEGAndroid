@@ -21,7 +21,7 @@ public class Util {
      * @return
      */
     public boolean doesSecretKeyExist(Context context) {
-        File keyFile = new File(context.getFilesDir(), Constants.SECRETKEY_FILENAME);
+        File keyFile = new File(context.getFilesDir(), Constants.SECRETKEYRING_FILENAME);
         if (keyFile.exists()) {
             return true;
         } else {

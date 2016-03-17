@@ -1,5 +1,6 @@
 package gov.anl.coar.meg.pgp;
 
+import android.app.Application;
 import android.content.Context;
 
 import org.spongycastle.bcpg.HashAlgorithmTags;
@@ -37,6 +38,8 @@ import gov.anl.coar.meg.exception.InvalidKeyException;
  */
 public class KeyGenerationLogic {
 
+    private static PGPSecretKeyRing mSecretKeyRing;
+
     public KeyGenerationLogic() {
         Security.addProvider(new BouncyCastleProvider());
     }
@@ -56,7 +59,7 @@ public class KeyGenerationLogic {
         return pgpKeyPair;
     }
 
-    public PGPKeyRingGenerator generateKeyRing(
+    private PGPKeyRingGenerator generateKeyRing(
             String identity,
             char[] password
     )
@@ -74,42 +77,45 @@ public class KeyGenerationLogic {
     }
 
     public void generateNewKeyRingAndKeys(
+            Application app,
             Context context,
             String firstName,
             String lastName,
             String email,
             char[] password
     )
-            throws InvalidKeyException, PGPException, IOException
+            throws InvalidKeyException, PGPException, IOException, NoSuchProviderException, NoSuchAlgorithmException
     {
-        try {
-            String identity = firstName + " " + lastName + " " + email;
-            PGPKeyPair keyPair = generateNewKeyPair();
-            PGPKeyRingGenerator keyRingGenerator = generateKeyRing(identity, password);
-            PGPSecretKeyRing secretKeyRing = keyRingGenerator.generateSecretKeyRing();
-            PGPPublicKeyRing publicKeyRing = keyRingGenerator.generatePublicKeyRing();
-            writeRings(context, secretKeyRing, publicKeyRing);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (NoSuchProviderException e) {
-            e.printStackTrace();
-        }
+        String identity = firstName + " " + lastName + " " + email;
+        PGPKeyRingGenerator keyRingGenerator = generateKeyRing(identity, password);
+        mSecretKeyRing = keyRingGenerator.generateSecretKeyRing();
+        PGPPublicKeyRing publicKeyRing = keyRingGenerator.generatePublicKeyRing();
+        writeRings(context, mSecretKeyRing, publicKeyRing);
+        PrivateKeyCache cache = (PrivateKeyCache) app;
+        cache.setSecretKeyRing(mSecretKeyRing);
+        cache.unlockSecretKey(password);
     }
 
-        private void writeRings(
-                Context context,
-                PGPSecretKeyRing secretKeyRing,
-                PGPPublicKeyRing pubKeyRing
-        )
-                throws IOException
-        {
-                File secretKeyRingFile = new File(context.getFilesDir(), Constants.SECRETKEYRING_FILENAME);
-                FileOutputStream secKeyRingOutput = new FileOutputStream(secretKeyRingFile);
-                secretKeyRing.encode(secKeyRingOutput);
-                secKeyRingOutput.close();
-                File publicKeyRingFile = new File(context.getFilesDir(), Constants.PUBLICKEYRING_FILENAME);
-                FileOutputStream pubKeyRingOutput = new FileOutputStream(publicKeyRingFile);
-                pubKeyRing.encode(pubKeyRingOutput);
-                pubKeyRingOutput.close();
-        }
+    public PGPSecretKeyRing getSecretKeyRing() {
+        return mSecretKeyRing;
+    }
+
+    private void writeRings(
+            Context context,
+            PGPSecretKeyRing secretKeyRing,
+            PGPPublicKeyRing pubKeyRing
+    )
+            throws IOException
+    {
+            File secretKeyRingFile = new File(context.getFilesDir(), Constants.SECRETKEYRING_FILENAME);
+            FileOutputStream secKeyRingOutput = context.openFileOutput(
+                    secretKeyRingFile.getPath(), Context.MODE_PRIVATE);
+            secretKeyRing.encode(secKeyRingOutput);
+            secKeyRingOutput.close();
+            File publicKeyRingFile = new File(context.getFilesDir(), Constants.PUBLICKEYRING_FILENAME);
+            FileOutputStream pubKeyRingOutput = context.openFileOutput(
+                    publicKeyRingFile.getPath(), Context.MODE_PRIVATE);
+            pubKeyRing.encode(pubKeyRingOutput);
+            pubKeyRingOutput.close();
+    }
 }

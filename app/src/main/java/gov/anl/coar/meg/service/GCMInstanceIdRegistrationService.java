@@ -7,9 +7,11 @@ import android.os.ResultReceiver;
 import android.util.Log;
 
 import com.github.kevinsawicki.http.HttpRequest;
+import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -32,7 +34,9 @@ public class GCMInstanceIdRegistrationService extends IntentService{
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
+    protected void onHandleIntent(
+            Intent intent
+    ) {
         Bundle bundle = new Bundle();
         ResultReceiver result = intent.getParcelableExtra("receiver");
         try {
@@ -61,8 +65,14 @@ public class GCMInstanceIdRegistrationService extends IntentService{
     }
 
     public void sendTokenToServer(
-            ResultReceiver result, Bundle bundle, String token, String phoneNumber, String email)
-            throws InterruptedException {
+            ResultReceiver result,
+            Bundle bundle,
+            String token,
+            String phoneNumber,
+            String email
+    )
+            throws InterruptedException
+    {
         String url = Constants.MEG_API_URL + STORE_INSTANCE_ID_API_ROUTE;
         Map<String, String> data = new HashMap<String, String>();
         data.put("gcm_instance_id", token);

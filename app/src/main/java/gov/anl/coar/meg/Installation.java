@@ -16,6 +16,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+
 import org.spongycastle.openpgp.PGPException;
 
 import gov.anl.coar.meg.exception.InvalidKeyException;
@@ -129,15 +132,14 @@ public class Installation extends AppCompatActivity
         switch (v.getId()) {
             // Eventually we want to re-add the advanced options button but not now
             case R.id.bNext: {
+                if (new Util().doesSecretKeyExist(this)) {
+                    // generate some kind of alert then break or go back to the
+                    // main screen after user hits OK
+                    alreadyCreatedKeyBuilder().show();
+                    break;
+                }
+                // Eventually we want to add form validation
                 try {
-                    if (new Util().doesSecretKeyExist(this)) {
-                        // generate some kind of alert then break or go back to the
-                        // main screen after user hits OK
-                        alreadyCreatedKeyBuilder().show();
-                        break;
-                    }
-                    // Eventually we want to add form validation but not yet.
-                    // this would slow down development
                     String firstName = etFirstName.getText().toString();
                     String lastName = etLastName.getText().toString();
                     String email = etEmail.getText().toString();
@@ -145,23 +147,29 @@ public class Installation extends AppCompatActivity
                     char[] password = etPassword.getText().toString().toCharArray();
                     writeConfigVarToFile(Constants.PHONENUMBER_FILENAME, phoneNumber);
                     writeConfigVarToFile(Constants.EMAIL_FILENAME, email);
-                    new KeyGenerationLogic().generateNewKeyRingAndKeys(this, firstName, lastName, email, password);
+                    KeyGenerationLogic keyGeneration = new KeyGenerationLogic();
+                    keyGeneration.generateNewKeyRingAndKeys(
+                            getApplication(), this, firstName, lastName, email, password);
                     passwordConfirmBuilder().show();
                 } catch (InvalidKeyException e) {
                     // Something went wrong don't know what and I need to
                     // eventually figure out how to handle this
                     somethingWrongAlertBuilder().show();
                     e.printStackTrace();
-                    return;
                 } catch (PGPException e) {
                     somethingWrongAlertBuilder().show();
                     e.printStackTrace();
-                    return;
                 } catch (IOException e) {
                     somethingWrongAlertBuilder().show();
                     e.printStackTrace();
-                    return;
+                } catch (NoSuchProviderException e) {
+                    somethingWrongAlertBuilder().show();
+                    e.printStackTrace();
+                } catch (NoSuchAlgorithmException e) {
+                    somethingWrongAlertBuilder().show();
+                    e.printStackTrace();
                 }
+                return;
             }
         }
     }
