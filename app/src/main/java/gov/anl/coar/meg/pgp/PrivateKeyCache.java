@@ -16,14 +16,32 @@ import gov.anl.coar.meg.Constants;
  */
 public class PrivateKeyCache extends Application {
     private static PGPSecretKeyRing mSecretKeyRing;
+    // We need to do some investigation on the persistence of this item. Will it be
+    // alive for the entire time the phone is alive? The last thing the user wants is
+    // to have to continuously log in to MEG over and over again.
+    // if this isn't the right path to take then passing the Private Key around between
+    // java classes might be preferable. I'm currently not sure how to go about doing this
+    // though in a way that can ensure persistence. A reasonable explanation of this
+    // whole thing can be found here
+    // http://www.developerphil.com/dont-store-data-in-the-application-object/
+    //
+    // For now a global object under the Application should work ok. Especially as
+    // we try to get MEG into a place where it can be demo'd. It's just when
+    // we actually have real users we want to consider them
     private static PGPPrivateKey mPrivateKey;
 
-    void unlockSecretKey(char[] passphrase) throws PGPException {
+    public void unlockSecretKey(char[] passphrase) throws PGPException {
         mPrivateKey = mSecretKeyRing.getSecretKey().extractPrivateKey(
                 new JcePBESecretKeyDecryptorBuilder().setProvider(Constants.SPONGY_CASTLE).build(passphrase)
         );
     }
 
+    public boolean needsRefresh() {
+        if (mPrivateKey == null)
+            return true;
+        else
+            return false;
+    }
     // No modifier means its only available to the package
     PGPSecretKeyRing getSecretKeyRing() {
         return mSecretKeyRing;

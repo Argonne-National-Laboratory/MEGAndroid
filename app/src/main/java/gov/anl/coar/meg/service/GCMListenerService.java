@@ -52,7 +52,9 @@ public class GCMListenerService extends GcmListenerService{
         // We give it 0 retries because this is the first method call. It is up to later method
         // calls for recursive function
         HttpRequest response = getEncryptedMessage(messageId, 0);
+        // Extract JSON from the response.
         BufferedInputStream responseBuffer = response.buffer();
+        Log.d(TAG, "Received response: " + response.body() + " from server");
         // TODO add symmetric key encryption
         BufferedInputStream decryptedInBuffer =
                 EncryptionLogic.decryptMessageWithPK(responseBuffer);
@@ -71,6 +73,7 @@ public class GCMListenerService extends GcmListenerService{
     {
         HttpRequest response = HttpRequest.get(
                 Constants.MEG_API_URL + ENCRYPTED_MSG_URL, true, "message_id", messageId);
+        response = response.acceptJson();
         // What do we do in the case of stuff like 404 errors? Why don't we just
         // retry right now and worry about hardening later
         if (response.code() != 200 && numberRetries < MAX_RETRIES) {

@@ -3,6 +3,7 @@ package gov.anl.coar.meg.pgp;
 import android.app.Application;
 import android.content.Context;
 
+import org.spongycastle.bcpg.ArmoredOutputStream;
 import org.spongycastle.bcpg.HashAlgorithmTags;
 import org.spongycastle.jce.provider.BouncyCastleProvider;
 import org.spongycastle.openpgp.PGPEncryptedData;
@@ -96,10 +97,6 @@ public class KeyGenerationLogic {
         cache.unlockSecretKey(password);
     }
 
-    public PGPSecretKeyRing getSecretKeyRing() {
-        return mSecretKeyRing;
-    }
-
     private void writeRings(
             Context context,
             PGPSecretKeyRing secretKeyRing,
@@ -107,15 +104,15 @@ public class KeyGenerationLogic {
     )
             throws IOException
     {
-            File secretKeyRingFile = new File(context.getFilesDir(), Constants.SECRETKEYRING_FILENAME);
             FileOutputStream secKeyRingOutput = context.openFileOutput(
-                    secretKeyRingFile.getPath(), Context.MODE_PRIVATE);
+                    Constants.SECRETKEYRING_FILENAME, Context.MODE_PRIVATE);
             secretKeyRing.encode(secKeyRingOutput);
             secKeyRingOutput.close();
-            File publicKeyRingFile = new File(context.getFilesDir(), Constants.PUBLICKEYRING_FILENAME);
             FileOutputStream pubKeyRingOutput = context.openFileOutput(
-                    publicKeyRingFile.getPath(), Context.MODE_PRIVATE);
-            pubKeyRing.encode(pubKeyRingOutput);
+                    Constants.PUBLICKEYRING_FILENAME, Context.MODE_PRIVATE);
+            // Ensure it is armored and so that we can send it to our server.
+            ArmoredOutputStream publicOut = new ArmoredOutputStream(pubKeyRingOutput);
+            pubKeyRing.encode(publicOut);
             pubKeyRingOutput.close();
     }
 }

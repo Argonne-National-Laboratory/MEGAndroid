@@ -56,7 +56,8 @@ public class GCMInstanceIdRegistrationService extends IntentService{
             // send the token to the server for storage
             Log.d(TAG, "Received token " + token);
             sendTokenToServer(result, bundle, token, phoneNumber, email);
-            // no subscription to topics is necessary.
+            // no subscription to topics is necessary since topics are essentially
+            // broadcast messages.
         } catch (Exception e) {
             Log.w(TAG, "Failed to grab instance id " + e.toString());
             bundle.putString("result", e.toString());

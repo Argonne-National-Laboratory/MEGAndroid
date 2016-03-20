@@ -128,9 +128,15 @@ public class MainActivity extends AppCompatActivity
     public void onReceiveResult(int resultCode, Bundle resultData) {
         Log.d(TAG, "received result " + resultCode + " from " + GCMInstanceIdRegistrationService.class.toString());
         // We can add more fine grained handling of the error types later.
-        if (resultCode != ReceiverCode.IID_CODE_SUCCESS)
+        if (resultCode != ReceiverCode.IID_CODE_SUCCESS) {
+            Log.i(TAG,
+                    "Failure to grab instance id code: " +
+                            resultData.getString("statusCode") + " message: " +
+                            resultData.getString("message"));
             startService(mInstanceIdIntent);
-        else
+        }
+        else {
             stopService(mInstanceIdIntent);
+        }
     }
 }

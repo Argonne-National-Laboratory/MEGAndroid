@@ -5,6 +5,10 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import org.spongycastle.openpgp.PGPException;
+
+import gov.anl.coar.meg.pgp.PrivateKeyCache;
+
 /** Class to provide functionality to the Login page of MEG
  *
  * 	@author Bridget Basan
@@ -14,8 +18,18 @@ public class Login extends AppCompatActivity {
 	/** Default method */
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_login);
+      try {
+          super.onCreate(savedInstanceState);
+          setContentView(R.layout.activity_login);
+          // XXX TODO This is a temporary hack
+          PrivateKeyCache privateKeyCache = (PrivateKeyCache) getApplication();
+          if (privateKeyCache.needsRefresh()) {
+                  privateKeyCache.unlockSecretKey("foobar".toCharArray());
+          }
+      } catch (PGPException e) {
+          e.printStackTrace();
+      }
+
   }
 
 	/** Default method */
