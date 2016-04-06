@@ -8,4 +8,6 @@ public class ReceiverCode {
     public static final int IID_CODE_PHONE_NUMBER_FAILURE = 1;
     public static final int IID_CODE_GCM_FAILURE = 2;
     public static final int IID_CODE_MEGSERVER_FAILURE = 3;
+    public static final int IID_NO_PUBLIC_KEY_FAILURE = 4;
+    public static final int IID_APP_FAILURE = 5;
 }

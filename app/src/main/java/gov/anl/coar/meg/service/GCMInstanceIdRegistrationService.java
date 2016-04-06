@@ -7,11 +7,9 @@ import android.os.ResultReceiver;
 import android.util.Log;
 
 import com.github.kevinsawicki.http.HttpRequest;
-import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;

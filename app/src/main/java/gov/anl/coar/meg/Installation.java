@@ -4,8 +4,10 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,6 +25,10 @@ import org.spongycastle.openpgp.PGPException;
 
 import gov.anl.coar.meg.exception.InvalidKeyException;
 import gov.anl.coar.meg.pgp.KeyGenerationLogic;
+import gov.anl.coar.meg.receiver.MEGResultReceiver;
+import gov.anl.coar.meg.receiver.MEGResultReceiver.Receiver;
+import gov.anl.coar.meg.receiver.ReceiverCode;
+import gov.anl.coar.meg.service.KeyRegistrationService;
 
 /** Class to provide functionality to the installation page of MEG
  * Adds functionality to buttons which open new intents
@@ -31,7 +37,7 @@ import gov.anl.coar.meg.pgp.KeyGenerationLogic;
  * @author Greg Rehm
  */
 public class Installation extends AppCompatActivity
-    implements View.OnClickListener {
+    implements View.OnClickListener, Receiver {
 
     Button bNext;
     EditText etFirstName;
@@ -39,6 +45,9 @@ public class Installation extends AppCompatActivity
     EditText etEmail;
     EditText etPassword;
     EditText etPhone;
+    MEGResultReceiver publicKeyResultReceiver;
+    Intent mKeyRegistrationIntent;
+    private static final String TAG = "InstallationActivity";
 
     /**
      * Instantiate the screen
@@ -59,6 +68,11 @@ public class Installation extends AppCompatActivity
         etEmail = (EditText) findViewById(R.id.etEmail);
         etPassword = (EditText) findViewById(R.id.etPassword);
         etPhone = (EditText) findViewById(R.id.etPhone);
+
+        publicKeyResultReceiver = new MEGResultReceiver(new Handler());
+        publicKeyResultReceiver.setReceiver(this);
+        mKeyRegistrationIntent = new Intent(this, KeyRegistrationService.class);
+        mKeyRegistrationIntent.putExtra("receiver", publicKeyResultReceiver);
     }
 
     public void writeConfigVarToFile(String filename, String item) {
@@ -134,7 +148,10 @@ public class Installation extends AppCompatActivity
             case R.id.bNext: {
                 if (new Util().doesSecretKeyExist(this)) {
                     // generate some kind of alert then break or go back to the
-                    // main screen after user hits OK
+                    // main screen after user hits OK. The whole deal on this is
+                    // that we eventually want to direct the user to some forgot
+                    // password screen so that they can reset their key. However at
+                    // the moment this is a TODO
                     alreadyCreatedKeyBuilder().show();
                     break;
                 }
@@ -150,7 +167,9 @@ public class Installation extends AppCompatActivity
                     KeyGenerationLogic keyGeneration = new KeyGenerationLogic();
                     keyGeneration.generateNewKeyRingAndKeys(
                             getApplication(), this, firstName, lastName, email, password);
+                    keyGeneration.generateRevocationCert(getApplication(), this);
                     passwordConfirmBuilder().show();
+                    startService(mKeyRegistrationIntent);
                 } catch (InvalidKeyException e) {
                     // Something went wrong don't know what and I need to
                     // eventually figure out how to handle this
@@ -199,5 +218,14 @@ public class Installation extends AppCompatActivity
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onReceiveResult(int resultCode, Bundle resultData) {
+        Log.d(TAG, "Received result code: " + resultCode + " and status code: " + resultData.getInt("statusCode"));
+        if (resultCode != ReceiverCode.IID_CODE_SUCCESS)
+            startService(mKeyRegistrationIntent);
+        else
+            stopService(mKeyRegistrationIntent);
     }
 }

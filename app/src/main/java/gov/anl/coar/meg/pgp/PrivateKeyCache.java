@@ -4,6 +4,7 @@ import android.app.Application;
 
 import org.spongycastle.openpgp.PGPException;
 import org.spongycastle.openpgp.PGPPrivateKey;
+import org.spongycastle.openpgp.PGPSecretKey;
 import org.spongycastle.openpgp.PGPSecretKeyRing;
 import org.spongycastle.openpgp.operator.jcajce.JcePBESecretKeyDecryptorBuilder;
 
@@ -45,6 +46,10 @@ public class PrivateKeyCache extends Application {
     // No modifier means its only available to the package
     PGPSecretKeyRing getSecretKeyRing() {
         return mSecretKeyRing;
+    }
+
+    PGPSecretKey getSecretKey() {
+        return mSecretKeyRing.getSecretKey();
     }
 
     PGPPrivateKey getPrivateKey() {

@@ -57,7 +57,9 @@ public class GCMListenerService extends GcmListenerService{
         Log.d(TAG, "Received response: " + response.body() + " from server");
         // TODO add symmetric key encryption
         BufferedInputStream decryptedInBuffer =
-                EncryptionLogic.decryptMessageWithPK(responseBuffer);
+                EncryptionLogic.decryptMessageWithPK(responseBuffer, getApplication());
+        if (decryptedInBuffer == null)
+            throw new Exception("Unable to decrypt message " + responseBuffer.toString());
         BufferedInputStream symInBuffer =
                 EncryptionLogic.encryptMessageWithSymKey(decryptedInBuffer);
         // I'm sure I need to add headers or something. For now don't do anything

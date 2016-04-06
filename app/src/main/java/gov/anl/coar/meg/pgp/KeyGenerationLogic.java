@@ -3,7 +3,6 @@ package gov.anl.coar.meg.pgp;
 import android.app.Application;
 import android.content.Context;
 
-import org.spongycastle.bcpg.ArmoredOutputStream;
 import org.spongycastle.bcpg.HashAlgorithmTags;
 import org.spongycastle.jce.provider.BouncyCastleProvider;
 import org.spongycastle.openpgp.PGPEncryptedData;
@@ -11,7 +10,6 @@ import org.spongycastle.openpgp.PGPException;
 import org.spongycastle.openpgp.PGPKeyPair;
 import org.spongycastle.openpgp.PGPKeyRingGenerator;
 import org.spongycastle.openpgp.PGPPublicKey;
-import org.spongycastle.openpgp.PGPPublicKeyRing;
 import org.spongycastle.openpgp.PGPSecretKeyRing;
 import org.spongycastle.openpgp.PGPSignature;
 import org.spongycastle.openpgp.operator.PGPDigestCalculator;
@@ -20,7 +18,6 @@ import org.spongycastle.openpgp.operator.jcajce.JcaPGPDigestCalculatorProviderBu
 import org.spongycastle.openpgp.operator.jcajce.JcaPGPKeyPair;
 import org.spongycastle.openpgp.operator.jcajce.JcePBESecretKeyEncryptorBuilder;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.KeyPair;
@@ -36,10 +33,13 @@ import gov.anl.coar.meg.exception.InvalidKeyException;
 
 /**
  * Created by greg on 3/8/16.
+ *
+ * TODO We need to have the keys self-signed upon generation as well.
  */
 public class KeyGenerationLogic {
 
     private static PGPSecretKeyRing mSecretKeyRing;
+    private static final String REVOCATION_DESCRIPTION = "automatically generated revocation certificate";
 
     public KeyGenerationLogic() {
         Security.addProvider(new BouncyCastleProvider());
@@ -78,7 +78,7 @@ public class KeyGenerationLogic {
     }
 
     public void generateNewKeyRingAndKeys(
-            Application app,
+            Application application,
             Context context,
             String firstName,
             String lastName,
@@ -90,17 +90,30 @@ public class KeyGenerationLogic {
         String identity = firstName + " " + lastName + " " + email;
         PGPKeyRingGenerator keyRingGenerator = generateKeyRing(identity, password);
         mSecretKeyRing = keyRingGenerator.generateSecretKeyRing();
-        PGPPublicKeyRing publicKeyRing = keyRingGenerator.generatePublicKeyRing();
+        MEGPublicKeyRing publicKeyRing = (MEGPublicKeyRing) keyRingGenerator.generatePublicKeyRing();
         writeRings(context, mSecretKeyRing, publicKeyRing);
-        PrivateKeyCache cache = (PrivateKeyCache) app;
+        PrivateKeyCache cache = (PrivateKeyCache) application;
         cache.setSecretKeyRing(mSecretKeyRing);
         cache.unlockSecretKey(password);
+    }
+
+    public void generateRevocationCert(
+            Application application,
+            Context context
+    )
+            throws PGPException, IOException
+    {
+        PrivateKeyCache cache = (PrivateKeyCache) application;
+        PGPPublicKey publicKey = cache.getSecretKey().getPublicKey();
+        MEGRevocationKey revocationKey = MEGRevocationKey.generate(publicKey, cache.getPrivateKey(), REVOCATION_DESCRIPTION);
+        MEGPublicKeyRing publicKeyRing = MEGPublicKeyRing.fromFile(context);
+        revocationKey.toFile(context, publicKeyRing);
     }
 
     private void writeRings(
             Context context,
             PGPSecretKeyRing secretKeyRing,
-            PGPPublicKeyRing pubKeyRing
+            MEGPublicKeyRing pubKeyRing
     )
             throws IOException
     {
@@ -108,11 +121,6 @@ public class KeyGenerationLogic {
                     Constants.SECRETKEYRING_FILENAME, Context.MODE_PRIVATE);
             secretKeyRing.encode(secKeyRingOutput);
             secKeyRingOutput.close();
-            FileOutputStream pubKeyRingOutput = context.openFileOutput(
-                    Constants.PUBLICKEYRING_FILENAME, Context.MODE_PRIVATE);
-            // Ensure it is armored and so that we can send it to our server.
-            ArmoredOutputStream publicOut = new ArmoredOutputStream(pubKeyRingOutput);
-            pubKeyRing.encode(publicOut);
-            pubKeyRingOutput.close();
+            pubKeyRing.toFile(context);
     }
 }

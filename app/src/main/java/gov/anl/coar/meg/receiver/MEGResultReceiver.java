@@ -9,12 +9,12 @@ import android.os.ResultReceiver;
  * Created by greg on 3/7/16.
  */
 @SuppressLint("ParcelCreator")
-public class GCMInstanceIdResultReceiver extends ResultReceiver{
+public class MEGResultReceiver extends ResultReceiver{
 
-    private static final String TAG = "GcmIIDResultReceiver";
+    private static final String TAG = "MEGResultReceiver";
     private Receiver mReceiver;
 
-    public GCMInstanceIdResultReceiver(Handler handler) {
+    public MEGResultReceiver(Handler handler) {
         super(handler);
     }
 

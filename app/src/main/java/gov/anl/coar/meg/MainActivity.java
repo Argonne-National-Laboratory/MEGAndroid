@@ -13,8 +13,8 @@ import android.widget.Button;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
-import gov.anl.coar.meg.receiver.GCMInstanceIdResultReceiver;
-import gov.anl.coar.meg.receiver.GCMInstanceIdResultReceiver.Receiver;
+import gov.anl.coar.meg.receiver.MEGResultReceiver;
+import gov.anl.coar.meg.receiver.MEGResultReceiver.Receiver;
 import gov.anl.coar.meg.receiver.ReceiverCode;
 import gov.anl.coar.meg.service.GCMInstanceIdRegistrationService;
 
@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity
     Button bInstall;
     Button bLogin;
     Intent mInstanceIdIntent;
-    GCMInstanceIdResultReceiver mReceiver;
+    MEGResultReceiver mReceiver;
 
     /**	Instantiate bInstall and bLogin buttons
      *
@@ -53,11 +53,14 @@ public class MainActivity extends AppCompatActivity
         bLogin.setOnClickListener(this);
 
         if (checkPlayServices()) {
-            mReceiver = new GCMInstanceIdResultReceiver(new Handler());
+            mReceiver = new MEGResultReceiver(new Handler());
             mReceiver.setReceiver(this);
             mInstanceIdIntent = new Intent(this, GCMInstanceIdRegistrationService.class);
             mInstanceIdIntent.putExtra("receiver", mReceiver);
             startService(mInstanceIdIntent);
+        } else {
+            // TODO Some kind of warning to do something to set up google
+            // TODO play services
         }
     }
 

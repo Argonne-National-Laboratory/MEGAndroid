@@ -7,8 +7,8 @@ import android.util.Log;
 
 import com.google.android.gms.iid.InstanceIDListenerService;
 
-import gov.anl.coar.meg.receiver.GCMInstanceIdResultReceiver;
-import gov.anl.coar.meg.receiver.GCMInstanceIdResultReceiver.Receiver;
+import gov.anl.coar.meg.receiver.MEGResultReceiver;
+import gov.anl.coar.meg.receiver.MEGResultReceiver.Receiver;
 import gov.anl.coar.meg.receiver.ReceiverCode;
 
 /**
@@ -25,12 +25,12 @@ public class GCMInstanceIdListenerService
     private static final String TAG = "GcmListener";
 
     Intent mInstanceIdIntent;
-    GCMInstanceIdResultReceiver mReceiver;
+    MEGResultReceiver mReceiver;
 
     @Override
     public void onTokenRefresh() {
         Log.i(TAG, "Attempting to retrieve new instance id.");
-        mReceiver = new GCMInstanceIdResultReceiver(new Handler());
+        mReceiver = new MEGResultReceiver(new Handler());
         mReceiver.setReceiver(this);
         mInstanceIdIntent = new Intent(this, GCMInstanceIdRegistrationService.class);
         mInstanceIdIntent.putExtra("receiver", mReceiver);
