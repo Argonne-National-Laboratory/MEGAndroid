@@ -23,11 +23,12 @@ import gov.anl.coar.meg.Constants;
 /**
  * Created by greg on 4/6/16.
  */
-public class MEGPublicKeyRing extends PGPPublicKeyRing {
-    PGPPublicKeyRing mKeyRing;
+public class MEGPublicKeyRing {
+    private PGPPublicKeyRing mKeyRing;
+    private PGPPublicKeyRing keyRing;
 
-    public MEGPublicKeyRing(byte[] encoding, KeyFingerPrintCalculator fingerPrintCalculator) throws IOException {
-        super(encoding, fingerPrintCalculator);
+    public MEGPublicKeyRing(PGPPublicKeyRing publicKeyRing) {
+        mKeyRing = publicKeyRing;
     }
 
     public static MEGPublicKeyRing fromFile(
@@ -49,9 +50,35 @@ public class MEGPublicKeyRing extends PGPPublicKeyRing {
             while (keyIter.hasNext()) {
                 PGPPublicKey key = (PGPPublicKey) keyIter.next();
                 if (key.isEncryptionKey()) {
-                    response = (MEGPublicKeyRing) keyRing;
+                    response = new MEGPublicKeyRing(keyRing);
                     break;
                 }
+            }
+        }
+        return response;
+    }
+
+    public PGPPublicKey getMasterPublicKey() {
+        PGPPublicKey response = null;
+        Iterator keyIter = mKeyRing.getPublicKeys();
+        while (keyIter.hasNext()) {
+            PGPPublicKey key = (PGPPublicKey) keyIter.next();
+            if (key.isEncryptionKey()) {
+                response = key;
+                break;
+            }
+        }
+        return response;
+    }
+
+    public PGPPublicKey getRevocationKey() {
+        PGPPublicKey response = null;
+        Iterator keyIter = mKeyRing.getPublicKeys();
+        while (keyIter.hasNext()) {
+            PGPPublicKey key = (PGPPublicKey) keyIter.next();
+            if (key.hasRevocation()) {
+                response = key;
+                break;
             }
         }
         return response;
@@ -65,7 +92,11 @@ public class MEGPublicKeyRing extends PGPPublicKeyRing {
         FileOutputStream pubKeyRingOutput = context.openFileOutput(
                 Constants.PUBLICKEYRING_FILENAME, Context.MODE_PRIVATE
         );
-        this.encode(pubKeyRingOutput);
+        mKeyRing.encode(pubKeyRingOutput);
         pubKeyRingOutput.close();
+    }
+
+    public PGPPublicKeyRing getKeyRing() {
+        return mKeyRing;
     }
 }

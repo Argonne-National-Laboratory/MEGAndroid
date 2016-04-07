@@ -89,26 +89,16 @@ public class Util {
         return getConfigVar(context, Constants.PHONENUMBER_FILENAME);
     }
 
-    public static String getPublicKey(
-            Context context
+    public static String getArmoredPublicKeyText(
+            PGPPublicKey publicKey
     ) {
         StringBuffer buf = new StringBuffer();
         try {
-            MEGPublicKeyRing keyRing = MEGPublicKeyRing.fromFile(context);
-            Iterator keyIter = keyRing.getPublicKeys();
-            while (keyIter.hasNext()) {
-                PGPPublicKey key = (PGPPublicKey) keyIter.next();
-                if (key.isEncryptionKey()) {
-                    ByteArrayOutputStream arr = new ByteArrayOutputStream();
-                    ArmoredOutputStream armored = new ArmoredOutputStream(arr);
-                    key.encode(armored);
-                    armored.close();
-                    buf.append(new String(arr.toByteArray(), Charset.forName("UTF-8")));
-                    break;
-                }
-            }
-        } catch (PGPException e1) {
-            e1.printStackTrace();
+            ByteArrayOutputStream arr = new ByteArrayOutputStream();
+            ArmoredOutputStream armored = new ArmoredOutputStream(arr);
+            publicKey.encode(armored);
+            armored.close();
+            buf.append(new String(arr.toByteArray(), Charset.forName("UTF-8")));
         } catch (IOException e1) {
             e1.printStackTrace();
         }

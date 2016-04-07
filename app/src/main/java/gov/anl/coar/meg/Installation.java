@@ -222,10 +222,12 @@ public class Installation extends AppCompatActivity
 
     @Override
     public void onReceiveResult(int resultCode, Bundle resultData) {
-        Log.d(TAG, "Received result code: " + resultCode + " and status code: " + resultData.getInt("statusCode"));
-        if (resultCode != ReceiverCode.IID_CODE_SUCCESS)
+        Log.d(TAG, "Received result code: " + resultCode);
+        // Only if we cannot reach MEG or the public key ring has not been written do we retry.
+        if (resultCode == ReceiverCode.IID_CODE_MEGSERVER_FAILURE || resultCode == ReceiverCode.IID_NO_PUBLIC_KEY_FAILURE) {
             startService(mKeyRegistrationIntent);
-        else
+        } else {
             stopService(mKeyRegistrationIntent);
+        }
     }
 }

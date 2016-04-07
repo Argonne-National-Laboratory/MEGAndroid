@@ -25,18 +25,11 @@ import gov.anl.coar.meg.Constants;
 /**
  * Created by greg on 4/6/16.
  */
-public class MEGRevocationKey extends PGPPublicKey {
+public class MEGRevocationKey {
+    PGPPublicKey mRevocationKey;
 
-    /**
-     * Create a PGP public key from a packet descriptor using the passed in fingerPrintCalculator to do calculate
-     * the fingerprint and keyID.
-     *
-     * @param publicKeyPacket       packet describing the public key.
-     * @param fingerPrintCalculator calculator providing the digest support ot create the key fingerprint.
-     * @throws PGPException if the packet is faulty, or the required calculations fail.
-     */
-    public MEGRevocationKey(PublicKeyPacket publicKeyPacket, KeyFingerPrintCalculator fingerPrintCalculator) throws PGPException {
-        super(publicKeyPacket, fingerPrintCalculator);
+    public MEGRevocationKey(PGPPublicKey revocationKey) {
+        mRevocationKey = revocationKey;
     }
 
     protected static MEGRevocationKey generate(
@@ -59,7 +52,8 @@ public class MEGRevocationKey extends PGPPublicKey {
         subGenerator.setRevocationReason(isCritical, RevocationReasonTags.KEY_RETIRED, description);
         PGPSignatureSubpacketVector vector = subGenerator.generate();
         signatureGenerator.setHashedSubpackets(vector);
-        return (MEGRevocationKey) PGPPublicKey.addCertification(publicKeyToRevoke, signatureGenerator.generate());
+        PGPPublicKey revocationKey = PGPPublicKey.addCertification(publicKeyToRevoke, signatureGenerator.generate());
+        return new MEGRevocationKey(revocationKey);
     }
 
     /**
@@ -67,12 +61,14 @@ public class MEGRevocationKey extends PGPPublicKey {
      */
     protected void toFile(
             Context context,
-            MEGPublicKeyRing keyRing
+            MEGPublicKeyRing megPublicKeyRing
     )
             throws IOException
     {
-        MEGPublicKeyRing ring = (MEGPublicKeyRing) PGPPublicKeyRing.insertPublicKey(keyRing, this);
-        ring.toFile(context);
+        PGPPublicKeyRing publicKeyRing = megPublicKeyRing.getKeyRing();
+        PGPPublicKeyRing modifiedRing = PGPPublicKeyRing.insertPublicKey(publicKeyRing, mRevocationKey);
+        MEGPublicKeyRing newRing = new MEGPublicKeyRing(modifiedRing);
+        newRing.toFile(context);
     }
 
     protected PGPPublicKey fromKeyRing(PGPPublicKeyRing keyRing) {

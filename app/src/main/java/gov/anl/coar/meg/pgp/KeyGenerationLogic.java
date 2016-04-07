@@ -10,6 +10,7 @@ import org.spongycastle.openpgp.PGPException;
 import org.spongycastle.openpgp.PGPKeyPair;
 import org.spongycastle.openpgp.PGPKeyRingGenerator;
 import org.spongycastle.openpgp.PGPPublicKey;
+import org.spongycastle.openpgp.PGPPublicKeyRing;
 import org.spongycastle.openpgp.PGPSecretKeyRing;
 import org.spongycastle.openpgp.PGPSignature;
 import org.spongycastle.openpgp.operator.PGPDigestCalculator;
@@ -90,8 +91,9 @@ public class KeyGenerationLogic {
         String identity = firstName + " " + lastName + " " + email;
         PGPKeyRingGenerator keyRingGenerator = generateKeyRing(identity, password);
         mSecretKeyRing = keyRingGenerator.generateSecretKeyRing();
-        MEGPublicKeyRing publicKeyRing = (MEGPublicKeyRing) keyRingGenerator.generatePublicKeyRing();
-        writeRings(context, mSecretKeyRing, publicKeyRing);
+        PGPPublicKeyRing publicKeyRing = keyRingGenerator.generatePublicKeyRing();
+        MEGPublicKeyRing megPublicKeyRing = new MEGPublicKeyRing(publicKeyRing);
+        writeRings(context, mSecretKeyRing, megPublicKeyRing);
         PrivateKeyCache cache = (PrivateKeyCache) application;
         cache.setSecretKeyRing(mSecretKeyRing);
         cache.unlockSecretKey(password);
@@ -113,7 +115,7 @@ public class KeyGenerationLogic {
     private void writeRings(
             Context context,
             PGPSecretKeyRing secretKeyRing,
-            MEGPublicKeyRing pubKeyRing
+            MEGPublicKeyRing megPublicKeyRing
     )
             throws IOException
     {
@@ -121,6 +123,6 @@ public class KeyGenerationLogic {
                     Constants.SECRETKEYRING_FILENAME, Context.MODE_PRIVATE);
             secretKeyRing.encode(secKeyRingOutput);
             secKeyRingOutput.close();
-            pubKeyRing.toFile(context);
+            megPublicKeyRing.toFile(context);
     }
 }
