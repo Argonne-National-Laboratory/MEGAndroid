@@ -57,6 +57,12 @@ public class GCMInstanceIdRegistrationService extends IntentService{
             // no subscription to topics is necessary since topics are essentially
             // broadcast messages.
         } catch (Exception e) {
+            // I need to figure out how to get rid of all these nested exceptions
+            try {
+                TimeUnit.SECONDS.sleep(Constants.INSTANCE_ID_RETRY_TIMEOUT);
+            } catch (InterruptedException e1) {
+                result.send(ReceiverCode.IID_CODE_GCM_FAILURE, bundle);
+            }
             Log.w(TAG, "Failed to grab instance id " + e.toString());
             bundle.putString("result", e.toString());
             result.send(ReceiverCode.IID_CODE_GCM_FAILURE, bundle);
@@ -83,8 +89,8 @@ public class GCMInstanceIdRegistrationService extends IntentService{
         bundle.putInt("statusCode", code);
         bundle.putString("message", response.message());
         if (code != 200) {
-            result.send(ReceiverCode.IID_CODE_MEGSERVER_FAILURE, bundle);
             TimeUnit.SECONDS.sleep(Constants.INSTANCE_ID_RETRY_TIMEOUT);
+            result.send(ReceiverCode.IID_CODE_MEGSERVER_FAILURE, bundle);
         } else {
             result.send(ReceiverCode.IID_CODE_SUCCESS, bundle);
         }

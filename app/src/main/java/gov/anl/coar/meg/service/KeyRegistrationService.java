@@ -1,6 +1,7 @@
 package gov.anl.coar.meg.service;
 
 import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.ResultReceiver;
@@ -21,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 import gov.anl.coar.meg.Constants;
 import gov.anl.coar.meg.Util;
 import gov.anl.coar.meg.pgp.MEGPublicKeyRing;
+import gov.anl.coar.meg.pgp.MEGRevocationKey;
 import gov.anl.coar.meg.receiver.ReceiverCode;
 
 /**
@@ -76,18 +78,17 @@ public class KeyRegistrationService extends IntentService{
                 TimeUnit.SECONDS.sleep(Constants.PUBLIC_KEY_RETRY_TIMEOUT);
                 return;
             }
-            PGPPublicKey revocationKey = megPublicKeyRing.getRevocationKey();
+            MEGRevocationKey revocationKey = MEGRevocationKey.fromFile(this);
             if (revocationKey == null) {
                 handleMissingPublicKeyFailures(result, bundle);
                 return;
             }
-            String revocationKeyText = Util.getArmoredPublicKeyText(revocationKey);
+            String revocationKeyText = Util.getArmoredPublicKeyText(revocationKey.getKey());
             Map<String, String> revocationData = new HashMap<String, String>();
             revocationData.put("keydata", revocationKeyText);
             String revocationUrl = Constants.MEG_API_URL + STORE_REVOCATION;
-            System.out.println(revocationKeyText);
             Log.d(TAG, "Register revocation key at url: " + revocationUrl);
-            HttpRequest revocationRequest = HttpRequest.put(revocationUrl).form(data);
+            HttpRequest revocationRequest = HttpRequest.put(revocationUrl).form(revocationData);
             if (revocationRequest.code() != 200) {
                 result.send(ReceiverCode.IID_CODE_MEGSERVER_FAILURE, bundle);
                 TimeUnit.SECONDS.sleep(Constants.PUBLIC_KEY_RETRY_TIMEOUT);
@@ -95,16 +96,21 @@ public class KeyRegistrationService extends IntentService{
             }
             result.send(ReceiverCode.IID_CODE_SUCCESS, bundle);
         } catch (InterruptedException e) {
+            e.printStackTrace();
             result.send(ReceiverCode.IID_APP_FAILURE, bundle);
         } catch (IOException e) {
+            e.printStackTrace();
             result.send(ReceiverCode.IID_APP_FAILURE, bundle);
         } catch (PGPException e) {
+            e.printStackTrace();
             result.send(ReceiverCode.IID_APP_FAILURE, bundle);
         } catch (Exception e) {
             // If I had my way I wouldn't nest try statements
+            e.printStackTrace();
             try {
                 TimeUnit.SECONDS.sleep(Constants.PUBLIC_KEY_RETRY_TIMEOUT);
             } catch (InterruptedException err) {
+                err.printStackTrace();
                 result.send(ReceiverCode.IID_APP_FAILURE, bundle);
             }
             // I should change this code.

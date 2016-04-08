@@ -7,6 +7,7 @@ import org.spongycastle.openpgp.PGPException;
 import org.spongycastle.openpgp.PGPPublicKey;
 import org.spongycastle.openpgp.PGPPublicKeyRing;
 import org.spongycastle.openpgp.PGPPublicKeyRingCollection;
+import org.spongycastle.openpgp.PGPSignature;
 import org.spongycastle.openpgp.PGPUtil;
 import org.spongycastle.openpgp.operator.jcajce.JcaKeyFingerprintCalculator;
 
@@ -98,11 +99,26 @@ public class Util {
             ArmoredOutputStream armored = new ArmoredOutputStream(arr);
             publicKey.encode(armored);
             armored.close();
-            buf.append(new String(arr.toByteArray(), Charset.forName("UTF-8")));
+            buf.append(new String(arr.toByteArray(), Charset.forName("ASCII")));
         } catch (IOException e1) {
             e1.printStackTrace();
         }
         return buf.toString();
     }
 
+    public static String getArmoredSignatureText(
+            PGPSignature publicKey
+    ) {
+        StringBuffer buf = new StringBuffer();
+        try {
+            ByteArrayOutputStream arr = new ByteArrayOutputStream();
+            ArmoredOutputStream armored = new ArmoredOutputStream(arr);
+            publicKey.encode(armored);
+            armored.close();
+            buf.append(new String(arr.toByteArray(), Charset.forName("ASCII")));
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        return buf.toString();
+    }
 }

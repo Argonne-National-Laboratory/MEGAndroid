@@ -81,10 +81,26 @@ public class EncryptionLogic {
         return responseBuffer;
     }
 
+    public static BufferedInputStream decryptMessageWithSymKey(
+            BufferedInputStream buffer
+    ) {
+        // stub method
+        return buffer;
+    }
+
     public static BufferedInputStream encryptMessageWithSymKey(
             BufferedInputStream buffer
     ) {
         // just a stub
+        return buffer;
+    }
+
+    public static BufferedInputStream encryptMessageForRecipient(
+            BufferedInputStream buffer
+    ) {
+        // TODO how do we encrypt a message for multiple recipients?
+        // TODO do we make the same copy of the message multiple times over?
+        // stub method.
         return buffer;
     }
 }

@@ -88,7 +88,8 @@ public class KeyGenerationLogic {
     )
             throws InvalidKeyException, PGPException, IOException, NoSuchProviderException, NoSuchAlgorithmException
     {
-        String identity = firstName + " " + lastName + " " + email;
+        // Add the extra <email> because its more gpg-like
+        String identity = firstName + " " + lastName + " <" + email + ">";
         PGPKeyRingGenerator keyRingGenerator = generateKeyRing(identity, password);
         mSecretKeyRing = keyRingGenerator.generateSecretKeyRing();
         PGPPublicKeyRing publicKeyRing = keyRingGenerator.generatePublicKeyRing();
@@ -108,8 +109,7 @@ public class KeyGenerationLogic {
         PrivateKeyCache cache = (PrivateKeyCache) application;
         PGPPublicKey publicKey = cache.getSecretKey().getPublicKey();
         MEGRevocationKey revocationKey = MEGRevocationKey.generate(publicKey, cache.getPrivateKey(), REVOCATION_DESCRIPTION);
-        MEGPublicKeyRing publicKeyRing = MEGPublicKeyRing.fromFile(context);
-        revocationKey.toFile(context, publicKeyRing);
+        revocationKey.toFile(context);
     }
 
     private void writeRings(

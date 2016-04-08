@@ -30,14 +30,17 @@ public class MEGPublicKeyRing {
     public MEGPublicKeyRing(PGPPublicKeyRing publicKeyRing) {
         mKeyRing = publicKeyRing;
     }
-
-    public static MEGPublicKeyRing fromFile(
-            Context context
+    /**
+     * Get public key ring from a file
+     */
+    protected static MEGPublicKeyRing fromFile(
+            Context context,
+            String filename
     )
             throws IOException, PGPException
     {
         MEGPublicKeyRing response = null;
-        File pubkeyRingFile = new File(context.getFilesDir(), Constants.PUBLICKEYRING_FILENAME);
+        File pubkeyRingFile = new File(context.getFilesDir(), filename);
         InputStream keyIn = new BufferedInputStream(new FileInputStream(pubkeyRingFile.getPath()));
         PGPPublicKeyRingCollection collection = new PGPPublicKeyRingCollection(
                 PGPUtil.getDecoderStream(keyIn), new JcaKeyFingerprintCalculator()
@@ -58,12 +61,20 @@ public class MEGPublicKeyRing {
         return response;
     }
 
+    public static MEGPublicKeyRing fromFile(
+            Context context
+    )
+            throws IOException, PGPException
+    {
+        return fromFile(context, Constants.PUBLICKEYRING_FILENAME);
+    }
+
     public PGPPublicKey getMasterPublicKey() {
         PGPPublicKey response = null;
         Iterator keyIter = mKeyRing.getPublicKeys();
         while (keyIter.hasNext()) {
             PGPPublicKey key = (PGPPublicKey) keyIter.next();
-            if (key.isEncryptionKey()) {
+            if (key.isEncryptionKey() && !key.hasRevocation()) {
                 response = key;
                 break;
             }

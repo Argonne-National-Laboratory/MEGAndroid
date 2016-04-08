@@ -73,6 +73,7 @@ public class GCMListenerService extends GcmListenerService{
     )
             throws Exception
     {
+        // TODO add exception handling
         HttpRequest response = HttpRequest.get(
                 Constants.MEG_API_URL + ENCRYPTED_MSG_URL, true, "message_id", messageId);
         response = response.acceptJson();

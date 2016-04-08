@@ -146,6 +146,8 @@ public class Installation extends AppCompatActivity
         switch (v.getId()) {
             // Eventually we want to re-add the advanced options button but not now
             case R.id.bNext: {
+                // TODO This is just debug startService. remove this when we're set on implementation
+                startService(mKeyRegistrationIntent);
                 if (new Util().doesSecretKeyExist(this)) {
                     // generate some kind of alert then break or go back to the
                     // main screen after user hits OK. The whole deal on this is
