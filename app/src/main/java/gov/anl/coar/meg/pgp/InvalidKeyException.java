@@ -1,4 +1,4 @@
-package gov.anl.coar.meg.exception;
+package gov.anl.coar.meg.pgp;
 
 /**
  * Created by greg on 2/28/16.

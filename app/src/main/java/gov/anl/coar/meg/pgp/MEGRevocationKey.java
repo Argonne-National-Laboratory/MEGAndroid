@@ -4,26 +4,17 @@ import android.content.Context;
 
 import org.spongycastle.bcpg.sig.RevocationReasonTags;
 import org.spongycastle.openpgp.PGPException;
-import org.spongycastle.openpgp.PGPObjectFactory;
 import org.spongycastle.openpgp.PGPPrivateKey;
 import org.spongycastle.openpgp.PGPPublicKey;
-import org.spongycastle.openpgp.PGPPublicKeyRing;
 import org.spongycastle.openpgp.PGPSignature;
 import org.spongycastle.openpgp.PGPSignatureGenerator;
-import org.spongycastle.openpgp.PGPSignatureList;
 import org.spongycastle.openpgp.PGPSignatureSubpacketGenerator;
 import org.spongycastle.openpgp.PGPUtil;
 import org.spongycastle.openpgp.operator.jcajce.JcaKeyFingerprintCalculator;
 import org.spongycastle.openpgp.operator.jcajce.JcaPGPContentSignerBuilder;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Iterator;
 
 import gov.anl.coar.meg.Constants;
 
@@ -90,8 +81,9 @@ public class MEGRevocationKey {
     )
             throws IOException, PGPException
     {
-        MEGRevocationKey response = null;
         MEGPublicKeyRing ring = MEGPublicKeyRing.fromFile(context, Constants.REVOCATIONKEY_FILENAME);
+        if (ring == null)
+            throw new IllegalArgumentException("Was unable to retrieve revocation key from file!");
         return new MEGRevocationKey(ring.getRevocationKey());
     }
 

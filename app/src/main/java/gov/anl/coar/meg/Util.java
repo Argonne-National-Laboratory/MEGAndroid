@@ -3,28 +3,18 @@ package gov.anl.coar.meg;
 import android.content.Context;
 
 import org.spongycastle.bcpg.ArmoredOutputStream;
-import org.spongycastle.openpgp.PGPException;
 import org.spongycastle.openpgp.PGPPublicKey;
-import org.spongycastle.openpgp.PGPPublicKeyRing;
-import org.spongycastle.openpgp.PGPPublicKeyRingCollection;
 import org.spongycastle.openpgp.PGPSignature;
-import org.spongycastle.openpgp.PGPUtil;
-import org.spongycastle.openpgp.operator.jcajce.JcaKeyFingerprintCalculator;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.util.Iterator;
-
-import gov.anl.coar.meg.pgp.MEGPublicKeyRing;
-
+import java.util.Scanner;
 
 /**
  * Created by greg on 2/29/16.
@@ -120,5 +110,25 @@ public class Util {
             e1.printStackTrace();
         }
         return buf.toString();
+    }
+
+    public static String inputBufferToString(
+            InputStream input
+    ) {
+        Scanner s = new java.util.Scanner(input).useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
+    }
+
+    public static void inputStreamToOutputStream(
+            InputStream in,
+            ByteArrayOutputStream out
+    )
+            throws IOException
+    {
+        byte[] buffer = new byte[Constants.IO_BUFFER_SIZE];
+        int len;
+        while ((len = in.read(buffer)) != -1) {
+            out.write(buffer, 0, len);
+        }
     }
 }

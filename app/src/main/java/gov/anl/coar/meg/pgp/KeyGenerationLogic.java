@@ -30,7 +30,6 @@ import java.security.Security;
 import java.util.Date;
 
 import gov.anl.coar.meg.Constants;
-import gov.anl.coar.meg.exception.InvalidKeyException;
 
 /**
  * Created by greg on 3/8/16.
@@ -86,18 +85,18 @@ public class KeyGenerationLogic {
             String email,
             char[] password
     )
-            throws InvalidKeyException, PGPException, IOException, NoSuchProviderException, NoSuchAlgorithmException
+            throws Exception
     {
         // Add the extra <email> because its more gpg-like
         String identity = firstName + " " + lastName + " <" + email + ">";
         PGPKeyRingGenerator keyRingGenerator = generateKeyRing(identity, password);
+        // TODO need to put expiration date on the keys.
         mSecretKeyRing = keyRingGenerator.generateSecretKeyRing();
         PGPPublicKeyRing publicKeyRing = keyRingGenerator.generatePublicKeyRing();
         MEGPublicKeyRing megPublicKeyRing = new MEGPublicKeyRing(publicKeyRing);
         writeRings(context, mSecretKeyRing, megPublicKeyRing);
         PrivateKeyCache cache = (PrivateKeyCache) application;
-        cache.setSecretKeyRing(mSecretKeyRing);
-        cache.unlockSecretKey(password);
+        cache.refreshPK(context, password);
     }
 
     public void generateRevocationCert(
@@ -119,10 +118,10 @@ public class KeyGenerationLogic {
     )
             throws IOException
     {
-            FileOutputStream secKeyRingOutput = context.openFileOutput(
-                    Constants.SECRETKEYRING_FILENAME, Context.MODE_PRIVATE);
-            secretKeyRing.encode(secKeyRingOutput);
-            secKeyRingOutput.close();
-            megPublicKeyRing.toFile(context);
+        FileOutputStream secKeyRingOutput = context.openFileOutput(
+                Constants.SECRETKEYRING_FILENAME, Context.MODE_PRIVATE);
+        secretKeyRing.encode(secKeyRingOutput);
+        secKeyRingOutput.close();
+        megPublicKeyRing.toFile(context);
     }
 }

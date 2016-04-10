@@ -1,14 +1,8 @@
 package gov.anl.coar.meg.test;
 
-import android.app.Instrumentation;
 import android.content.Context;
-import android.os.Looper;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.ActivityInstrumentationTestCase2;
-import android.test.suitebuilder.annotation.SmallTest;
-
-import junit.framework.TestCase;
-import junit.framework.TestResult;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +13,7 @@ import java.io.IOException;
 
 import gov.anl.coar.meg.Installation;
 import gov.anl.coar.meg.Util;
-import gov.anl.coar.meg.exception.InvalidKeyException;
+import gov.anl.coar.meg.pgp.InvalidKeyException;
 
 import static junit.framework.Assert.assertFalse;
 

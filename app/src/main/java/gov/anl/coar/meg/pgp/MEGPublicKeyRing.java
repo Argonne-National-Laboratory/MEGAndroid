@@ -7,7 +7,6 @@ import org.spongycastle.openpgp.PGPPublicKey;
 import org.spongycastle.openpgp.PGPPublicKeyRing;
 import org.spongycastle.openpgp.PGPPublicKeyRingCollection;
 import org.spongycastle.openpgp.PGPUtil;
-import org.spongycastle.openpgp.operator.KeyFingerPrintCalculator;
 import org.spongycastle.openpgp.operator.jcajce.JcaKeyFingerprintCalculator;
 
 import java.io.BufferedInputStream;
@@ -25,11 +24,11 @@ import gov.anl.coar.meg.Constants;
  */
 public class MEGPublicKeyRing {
     private PGPPublicKeyRing mKeyRing;
-    private PGPPublicKeyRing keyRing;
 
     public MEGPublicKeyRing(PGPPublicKeyRing publicKeyRing) {
         mKeyRing = publicKeyRing;
     }
+
     /**
      * Get public key ring from a file
      */
@@ -39,26 +38,9 @@ public class MEGPublicKeyRing {
     )
             throws IOException, PGPException
     {
-        MEGPublicKeyRing response = null;
         File pubkeyRingFile = new File(context.getFilesDir(), filename);
         InputStream keyIn = new BufferedInputStream(new FileInputStream(pubkeyRingFile.getPath()));
-        PGPPublicKeyRingCollection collection = new PGPPublicKeyRingCollection(
-                PGPUtil.getDecoderStream(keyIn), new JcaKeyFingerprintCalculator()
-        );
-        Iterator keyRingIter = collection.getKeyRings();
-        while (keyRingIter.hasNext()) {
-            PGPPublicKeyRing keyRing = (PGPPublicKeyRing) keyRingIter.next();
-
-            Iterator keyIter = keyRing.getPublicKeys();
-            while (keyIter.hasNext()) {
-                PGPPublicKey key = (PGPPublicKey) keyIter.next();
-                if (key.isEncryptionKey()) {
-                    response = new MEGPublicKeyRing(keyRing);
-                    break;
-                }
-            }
-        }
-        return response;
+        return fromInputStream(keyIn);
     }
 
     public static MEGPublicKeyRing fromFile(
@@ -69,30 +51,49 @@ public class MEGPublicKeyRing {
         return fromFile(context, Constants.PUBLICKEYRING_FILENAME);
     }
 
+    public static MEGPublicKeyRing fromInputStream(
+            InputStream inStream
+    )
+            throws IOException, PGPException
+    {
+        PGPPublicKeyRingCollection collection = new PGPPublicKeyRingCollection(
+                PGPUtil.getDecoderStream(inStream), new JcaKeyFingerprintCalculator()
+        );
+        Iterator keyRingIter = collection.getKeyRings();
+        while (keyRingIter.hasNext()) {
+            PGPPublicKeyRing keyRing = (PGPPublicKeyRing) keyRingIter.next();
+
+            Iterator keyIter = keyRing.getPublicKeys();
+            while (keyIter.hasNext()) {
+                PGPPublicKey key = (PGPPublicKey) keyIter.next();
+                if (key.isEncryptionKey()) {
+                    return new MEGPublicKeyRing(keyRing);
+                }
+            }
+        }
+        throw new IllegalArgumentException("Could not get a new public key ring from stream");
+    }
+
     public PGPPublicKey getMasterPublicKey() {
-        PGPPublicKey response = null;
         Iterator keyIter = mKeyRing.getPublicKeys();
         while (keyIter.hasNext()) {
             PGPPublicKey key = (PGPPublicKey) keyIter.next();
             if (key.isEncryptionKey() && !key.hasRevocation()) {
-                response = key;
-                break;
+                return key;
             }
         }
-        return response;
+        throw new IllegalArgumentException("Could not get master public key!");
     }
 
     public PGPPublicKey getRevocationKey() {
-        PGPPublicKey response = null;
         Iterator keyIter = mKeyRing.getPublicKeys();
         while (keyIter.hasNext()) {
             PGPPublicKey key = (PGPPublicKey) keyIter.next();
             if (key.hasRevocation()) {
-                response = key;
-                break;
+                return key;
             }
         }
-        return response;
+        throw new IllegalArgumentException("Could not find revocation key!");
     }
 
     public void toFile(
@@ -105,9 +106,5 @@ public class MEGPublicKeyRing {
         );
         mKeyRing.encode(pubKeyRingOutput);
         pubKeyRingOutput.close();
-    }
-
-    public PGPPublicKeyRing getKeyRing() {
-        return mKeyRing;
     }
 }

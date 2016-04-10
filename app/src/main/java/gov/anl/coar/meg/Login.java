@@ -21,12 +21,12 @@ public class Login extends AppCompatActivity {
       try {
           super.onCreate(savedInstanceState);
           setContentView(R.layout.activity_login);
-          // XXX TODO This is a temporary hack
           PrivateKeyCache privateKeyCache = (PrivateKeyCache) getApplication();
           if (privateKeyCache.needsRefresh()) {
-                  privateKeyCache.unlockSecretKey("foobar".toCharArray());
+              // XXX TODO This is a temporary hack
+              privateKeyCache.refreshPK(this, "foobar".toCharArray());
           }
-      } catch (PGPException e) {
+      } catch (Exception e) {
           e.printStackTrace();
       }
 

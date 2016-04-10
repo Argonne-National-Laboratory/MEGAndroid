@@ -23,7 +23,7 @@ import java.security.NoSuchProviderException;
 
 import org.spongycastle.openpgp.PGPException;
 
-import gov.anl.coar.meg.exception.InvalidKeyException;
+import gov.anl.coar.meg.pgp.InvalidKeyException;
 import gov.anl.coar.meg.pgp.KeyGenerationLogic;
 import gov.anl.coar.meg.receiver.MEGResultReceiver;
 import gov.anl.coar.meg.receiver.MEGResultReceiver.Receiver;
@@ -172,21 +172,9 @@ public class Installation extends AppCompatActivity
                     keyGeneration.generateRevocationCert(getApplication(), this);
                     passwordConfirmBuilder().show();
                     startService(mKeyRegistrationIntent);
-                } catch (InvalidKeyException e) {
+                } catch (Exception e) {
                     // Something went wrong don't know what and I need to
                     // eventually figure out how to handle this
-                    somethingWrongAlertBuilder().show();
-                    e.printStackTrace();
-                } catch (PGPException e) {
-                    somethingWrongAlertBuilder().show();
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    somethingWrongAlertBuilder().show();
-                    e.printStackTrace();
-                } catch (NoSuchProviderException e) {
-                    somethingWrongAlertBuilder().show();
-                    e.printStackTrace();
-                } catch (NoSuchAlgorithmException e) {
                     somethingWrongAlertBuilder().show();
                     e.printStackTrace();
                 }

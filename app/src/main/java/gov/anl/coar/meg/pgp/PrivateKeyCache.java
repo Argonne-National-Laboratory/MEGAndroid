@@ -1,6 +1,7 @@
 package gov.anl.coar.meg.pgp;
 
 import android.app.Application;
+import android.content.Context;
 
 import org.spongycastle.openpgp.PGPException;
 import org.spongycastle.openpgp.PGPPrivateKey;
@@ -31,13 +32,20 @@ public class PrivateKeyCache extends Application {
     // we actually have real users we want to consider them
     private static PGPPrivateKey mPrivateKey;
 
-    public void unlockSecretKey(char[] passphrase) throws PGPException {
+    public void refreshPK(
+            Context context,
+            char[] passphrase
+    )
+        throws Exception
+    {
+        mSecretKeyRing = MEGSecretKeyRing.fromFile(context);
         mPrivateKey = mSecretKeyRing.getSecretKey().extractPrivateKey(
                 new JcePBESecretKeyDecryptorBuilder().setProvider(Constants.SPONGY_CASTLE).build(passphrase)
         );
     }
 
-    public boolean needsRefresh() {
+    public boolean needsRefresh()
+    {
         if (mPrivateKey == null)
             return true;
         else
