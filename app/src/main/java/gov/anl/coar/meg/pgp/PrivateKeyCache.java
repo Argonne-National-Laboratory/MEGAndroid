@@ -17,6 +17,7 @@ import gov.anl.coar.meg.Constants;
  * Created by greg on 3/17/16.
  */
 public class PrivateKeyCache extends Application {
+    // I need some kind of constructor to set up the SpongyCastle security provider.
     private static PGPSecretKeyRing mSecretKeyRing;
     // We need to do some investigation on the persistence of this item. Will it be
     // alive for the entire time the phone is alive? The last thing the user wants is

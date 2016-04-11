@@ -23,7 +23,7 @@ public class MEGServerRequest {
     public static final String ADD_PUBLIC_KEY_URL = "/addkey/";
     private static final String ENCRYPTED_MSG_URL = "/encrypted_message/";
     private static final String DECRYPTED_MSG_URL = "/decrypted_message/";
-    private static final String GET_KEY_BY_MSG_ID_URL = "/get_key_by_message_id/";
+    private static final String GET_KEY_BY_MSG_ID_URL = "/getkey_by_message_id/";
     private static final String STORE_INSTANCE_ID_API_ROUTE = "/gcm_instance_id/";
     public static final String STORE_REVOCATION_URL = "/store_revocation_cert";
 
@@ -76,7 +76,7 @@ public class MEGServerRequest {
     )
             throws Exception
     {
-        Log.d(TAG, "returning message to server @ url: " + url);
+        Log.d(TAG, "put new message on server @ url: " + url);
         try {
             HttpRequest request = HttpRequest.put(
                     url, true, "associated_message_id", messageId,
@@ -184,6 +184,7 @@ public class MEGServerRequest {
             throws Exception
     {
         String url = mServerUrl + GET_KEY_BY_MSG_ID_URL;
+        Log.d(TAG, "Get associated public key for message: " + messageId);
         try {
             HttpRequest response = HttpRequest.get(url, true, "associated_message_id", messageId);
             if (response.ok())

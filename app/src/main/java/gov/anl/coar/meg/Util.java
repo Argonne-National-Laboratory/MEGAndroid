@@ -119,16 +119,18 @@ public class Util {
         return s.hasNext() ? s.next() : "";
     }
 
-    public static void inputStreamToOutputStream(
-            InputStream in,
-            ByteArrayOutputStream out
+    public static ByteArrayOutputStream inputStreamToOutputStream(
+            InputStream in
     )
             throws IOException
     {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
         byte[] buffer = new byte[Constants.IO_BUFFER_SIZE];
         int len;
-        while ((len = in.read(buffer)) != -1) {
+        while ((len = in.read(buffer, 0, buffer.length)) != -1) {
             out.write(buffer, 0, len);
         }
+        out.flush();
+        return out;
     }
 }

@@ -5,7 +5,9 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import org.spongycastle.openpgp.PGPException;
+import org.spongycastle.jce.provider.BouncyCastleProvider;
+
+import java.security.Security;
 
 import gov.anl.coar.meg.pgp.PrivateKeyCache;
 
@@ -24,6 +26,7 @@ public class Login extends AppCompatActivity {
           PrivateKeyCache privateKeyCache = (PrivateKeyCache) getApplication();
           if (privateKeyCache.needsRefresh()) {
               // XXX TODO This is a temporary hack
+              Security.addProvider(new BouncyCastleProvider());
               privateKeyCache.refreshPK(this, "foobar".toCharArray());
           }
       } catch (Exception e) {
