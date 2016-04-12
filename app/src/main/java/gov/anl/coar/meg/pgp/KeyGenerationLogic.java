@@ -40,6 +40,7 @@ public class KeyGenerationLogic {
 
     private static PGPSecretKeyRing mSecretKeyRing;
     private static final String REVOCATION_DESCRIPTION = "automatically generated revocation certificate";
+    private static final String COMMENT = "(MEG PGP Key)";
 
     public KeyGenerationLogic() {
         Security.addProvider(new BouncyCastleProvider());
@@ -88,7 +89,7 @@ public class KeyGenerationLogic {
             throws Exception
     {
         // Add the extra <email> because its more gpg-like
-        String identity = firstName + " " + lastName + " <" + email + ">";
+        String identity = firstName + " " + lastName + " " + COMMENT + " <" + email + ">";
         PGPKeyRingGenerator keyRingGenerator = generateKeyRing(identity, password);
         // TODO need to put expiration date on the keys.
         mSecretKeyRing = keyRingGenerator.generateSecretKeyRing();

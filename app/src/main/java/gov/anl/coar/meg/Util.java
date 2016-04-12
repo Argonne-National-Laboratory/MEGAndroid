@@ -69,35 +69,14 @@ public class Util {
     }
 
     public static String getPhoneNumber(Context context) {
-        // I imagine theres a case where the phone number is null. We can probably
-        // ignore this for now though
-        //
-        // This method will eventually become unreliable because phone numbers can change
-        // and we do not have a change phone number flow.
-        //
         // This has now morphed into a convenience method. I imagine we can
         // get rid of it soon.
         return getConfigVar(context, Constants.PHONENUMBER_FILENAME);
     }
 
+    // TODO we should probably move this to the PGP package under MEGPublicKeyRing
     public static String getArmoredPublicKeyText(
             PGPPublicKey publicKey
-    ) {
-        StringBuffer buf = new StringBuffer();
-        try {
-            ByteArrayOutputStream arr = new ByteArrayOutputStream();
-            ArmoredOutputStream armored = new ArmoredOutputStream(arr);
-            publicKey.encode(armored);
-            armored.close();
-            buf.append(new String(arr.toByteArray(), Charset.forName("ASCII")));
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }
-        return buf.toString();
-    }
-
-    public static String getArmoredSignatureText(
-            PGPSignature publicKey
     ) {
         StringBuffer buf = new StringBuffer();
         try {

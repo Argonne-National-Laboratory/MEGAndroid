@@ -1,8 +1,9 @@
 package gov.anl.coar.meg;
 
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -13,6 +14,11 @@ import android.widget.Button;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 
+import org.spongycastle.jce.provider.BouncyCastleProvider;
+
+import java.security.Security;
+
+import gov.anl.coar.meg.pgp.PrivateKeyCache;
 import gov.anl.coar.meg.receiver.MEGResultReceiver;
 import gov.anl.coar.meg.receiver.MEGResultReceiver.Receiver;
 import gov.anl.coar.meg.receiver.ReceiverCode;
@@ -22,10 +28,13 @@ import gov.anl.coar.meg.service.GCMInstanceIdRegistrationService;
 /** Class to provide functionality to the opening welcome page of MEG
  * Adds functionality to buttons which open new intents
  *
+ * TODO I'd like to move this class and all other java classes in gov.anl.coar.meg to a
+ * TODO new gov.anl.coar.meg.ui package.
+ *
  * @author Bridget Basan
  * @author Greg Rehm
  */
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends FragmentActivity
     implements View.OnClickListener, Receiver{
 
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
@@ -45,6 +54,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Security.addProvider(new BouncyCastleProvider());
 
         bInstall = (Button) findViewById(R.id.bInstall);
         bInstall.setOnClickListener(this);
@@ -76,9 +86,13 @@ public class MainActivity extends AppCompatActivity
                 startActivity(new Intent(this,Installation.class));
                 break;
             case R.id.bLogin:
+                PrivateKeyCache cache = (PrivateKeyCache) getApplication();
                 if (!new Util().doesSecretKeyExist(this)) {
                     bLogin.setError(Constants.LOGIN_BUT_NO_KEY);
-                    break;
+                } else if (cache.needsRefresh()) {
+                    FragmentManager fm = getFragmentManager();
+                    EnterPasswordDialog epd = new EnterPasswordDialog();
+                    epd.show(fm, TAG);
                 } else {
                     startActivity(new Intent(this, Login.class));
                 }

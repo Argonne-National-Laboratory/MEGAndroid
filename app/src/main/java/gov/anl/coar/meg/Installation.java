@@ -16,14 +16,8 @@ import android.widget.EditText;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintWriter;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 
-import org.spongycastle.openpgp.PGPException;
-
-import gov.anl.coar.meg.pgp.InvalidKeyException;
 import gov.anl.coar.meg.pgp.KeyGenerationLogic;
 import gov.anl.coar.meg.receiver.MEGResultReceiver;
 import gov.anl.coar.meg.receiver.MEGResultReceiver.Receiver;
@@ -148,30 +142,15 @@ public class Installation extends AppCompatActivity
             case R.id.bNext: {
                 // TODO This is just debug startService. remove this when we're set on implementation
                 startService(mKeyRegistrationIntent);
-                if (new Util().doesSecretKeyExist(this)) {
-                    // generate some kind of alert then break or go back to the
-                    // main screen after user hits OK. The whole deal on this is
-                    // that we eventually want to direct the user to some forgot
-                    // password screen so that they can reset their key. However at
-                    // the moment this is a TODO
-                    alreadyCreatedKeyBuilder().show();
-                    break;
-                }
-                // Eventually we want to add form validation
                 try {
-                    String firstName = etFirstName.getText().toString();
-                    String lastName = etLastName.getText().toString();
-                    String email = etEmail.getText().toString();
-                    String phoneNumber = etPhone.getText().toString();
-                    char[] password = etPassword.getText().toString().toCharArray();
-                    writeConfigVarToFile(Constants.PHONENUMBER_FILENAME, phoneNumber);
-                    writeConfigVarToFile(Constants.EMAIL_FILENAME, email);
-                    KeyGenerationLogic keyGeneration = new KeyGenerationLogic();
-                    keyGeneration.generateNewKeyRingAndKeys(
-                            getApplication(), this, firstName, lastName, email, password);
-                    keyGeneration.generateRevocationCert(getApplication(), this);
+                    performValidation();
+                    generateKeys();
                     passwordConfirmBuilder().show();
                     startService(mKeyRegistrationIntent);
+                } catch(NotValidatedException e) {
+                    // Don't do anything. The user already has errors on the text boxes
+                } catch (KeyAlreadyCreatedException e) {
+                    alreadyCreatedKeyBuilder().show();
                 } catch (Exception e) {
                     // Something went wrong don't know what and I need to
                     // eventually figure out how to handle this
@@ -183,6 +162,69 @@ public class Installation extends AppCompatActivity
         }
     }
 
+    private void generateKeys()
+            throws Exception
+    {
+        String firstName = etFirstName.getText().toString();
+        String lastName = etLastName.getText().toString();
+        String email = etEmail.getText().toString();
+        String phoneNumber = etPhone.getText().toString();
+        char[] password = etPassword.getText().toString().toCharArray();
+        writeConfigVarToFile(Constants.PHONENUMBER_FILENAME, phoneNumber);
+        writeConfigVarToFile(Constants.EMAIL_FILENAME, email);
+        KeyGenerationLogic keyGeneration = new KeyGenerationLogic();
+        keyGeneration.generateNewKeyRingAndKeys(
+                getApplication(), this, firstName, lastName, email, password);
+        keyGeneration.generateRevocationCert(getApplication(), this);
+    }
+
+    private void performValidation()
+            throws KeyAlreadyCreatedException, NotValidatedException
+    {
+        // generate some kind of alert then break or go back to the
+        // main screen after user hits OK. The whole deal on this is
+        // that we eventually want to direct the user to some forgot
+        // password screen so that they can reset their key. However at
+        // the moment this is a TODO
+        if (new Util().doesSecretKeyExist(this)) {
+            throw new KeyAlreadyCreatedException();
+        }
+        boolean throwNotValidatedError = false;
+        String firstName = etFirstName.getText().toString();
+        String lastName = etLastName.getText().toString();
+        String email = etEmail.getText().toString();
+        String phoneNumber = etPhone.getText().toString();
+        String password = etPassword.getText().toString();
+        if (firstName.isEmpty()) {
+            etFirstName.setError("Enter your first name");
+            throwNotValidatedError = true;
+        }
+        if (lastName.isEmpty()) {
+            etLastName.setError("Enter your last name");
+            throwNotValidatedError = true;
+        }
+        // TODO email validation regex will be necessary.
+        if (email.isEmpty()) {
+            etEmail.setError("Enter your email");
+            throwNotValidatedError = true;
+        }
+        if (phoneNumber.isEmpty()) {
+            etPhone.setError("Enter your phone number");
+            throwNotValidatedError = true;
+        } else if (phoneNumber.length() != 10) {
+            etPhone.setError("Enter a valid 10 digit (US) phone number");
+            throwNotValidatedError = true;
+        }
+        // TODO the error warning presents below the ? icon on android. We should
+        // TODO probably remove the ? icon
+        if (password.toString().isEmpty()) {
+            etPassword.setError("Enter a password!");
+            throwNotValidatedError = true;
+        }
+        if (throwNotValidatedError) {
+            throw new NotValidatedException("Installation user input is incomplete!");
+        }
+    }
     /**
      * Default method
      */

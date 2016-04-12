@@ -8,4 +8,9 @@
     <string name="install_alert_msg">This password will be your private key password. Do not share this with anyone.</string>
     <string name="something_wrong_pgp_msg">Something went wrong when creating your PGP key. Try again.</string>
     <string name="already_created_key_msg">You have already created a PGP key. Did you forget your password?</string>
+    <string name="enter_password_msg">Enter key password</string>
+    <string name="cancel">Cancel</string>
+    <string name="password">password</string>
+    <string name="retry">Retry</string>
+    <string name="incorrect_password_msg">The entered password was incorrect. Retry or Quit?</string>
 </resources>

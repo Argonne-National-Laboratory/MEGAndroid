@@ -5,10 +5,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import org.spongycastle.jce.provider.BouncyCastleProvider;
-
-import java.security.Security;
-
 import gov.anl.coar.meg.pgp.PrivateKeyCache;
 
 /** Class to provide functionality to the Login page of MEG
@@ -20,19 +16,8 @@ public class Login extends AppCompatActivity {
 	/** Default method */
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-      try {
-          super.onCreate(savedInstanceState);
-          setContentView(R.layout.activity_login);
-          PrivateKeyCache privateKeyCache = (PrivateKeyCache) getApplication();
-          if (privateKeyCache.needsRefresh()) {
-              // XXX TODO This is a temporary hack
-              Security.addProvider(new BouncyCastleProvider());
-              privateKeyCache.refreshPK(this, "foobar".toCharArray());
-          }
-      } catch (Exception e) {
-          e.printStackTrace();
-      }
-
+      super.onCreate(savedInstanceState);
+      setContentView(R.layout.activity_login);
   }
 
 	/** Default method */
