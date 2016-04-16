@@ -13,6 +13,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-gcm:8.4.0'
     compile 'com.madgag.spongycastle:core:1.54.0.0'
     compile 'com.madgag.spongycastle:pg:1.54.0.0'
+    compile 'me.dm7.barcodescanner:zbar:1.8.4'
 }
 
 android {

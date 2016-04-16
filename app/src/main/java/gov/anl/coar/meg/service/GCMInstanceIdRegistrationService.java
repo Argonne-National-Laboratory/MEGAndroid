@@ -10,6 +10,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import gov.anl.coar.meg.Constants;
 import gov.anl.coar.meg.R;
@@ -54,9 +55,16 @@ public class GCMInstanceIdRegistrationService extends IntentService{
             MEGServerRequest request = new MEGServerRequest();
             request.putToken(result, bundle, token, phoneNumber, email);
         } catch (Exception e) {
+            handleException(e, bundle, result);
+        }
+    }
+
+    private void handleException(Exception e, Bundle bundle, ResultReceiver result) {
+        try {
             Log.w(TAG, "Failed to grab instance id " + e.toString());
             bundle.putString("result", e.toString());
             result.send(ReceiverCode.IID_CODE_GCM_FAILURE, bundle);
-        }
+            TimeUnit.SECONDS.sleep(Constants.NO_REGISTRATION_RETRY_TIMEOUT);
+        } catch (InterruptedException ie) {}
     }
 }

@@ -41,7 +41,7 @@ public class UtilTest extends Fixtures{
     @Test
     public void doesSecretKeyExist_returnsTrue() throws IOException {
         Context mockContext = setupContext(mMockContext);
-        String path = this.TMP_DIR + Constants.SECRETKEY_FILENAME;
+        String path = this.TMP_DIR + Constants.SECRETKEYRING_FILENAME;
         File temp = new File(path);
         FileOutputStream output = new FileOutputStream(temp);
         output.write("".getBytes());

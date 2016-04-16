@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,6 +50,12 @@ public class Util {
             Context context
     ) {
         return doesKeyFileExist(context, Constants.SECRETKEYRING_FILENAME);
+    }
+
+    public static boolean doesSymmetricKeyExist(
+            Context context
+    ) {
+        return doesKeyFileExist(context, Constants.SYMMETRICKEY_META_FILENAME);
     }
 
     public static String getConfigVar(Context context, String varFilename) {
@@ -111,5 +118,17 @@ public class Util {
         }
         out.flush();
         return out;
+    }
+
+    public static void writeSymmetricMetadataFile(
+            Context context,
+            byte[] dataBytes
+    )
+            throws IOException
+    {
+        File file = new File(context.getFilesDir(), Constants.SYMMETRICKEY_META_FILENAME);
+        FileOutputStream stream = new FileOutputStream(file.getPath());
+        stream.write(dataBytes);
+        stream.close();
     }
 }

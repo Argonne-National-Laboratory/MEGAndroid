@@ -4,6 +4,15 @@ import android.app.Application;
 import android.content.Context;
 
 import org.spongycastle.bcpg.HashAlgorithmTags;
+import org.spongycastle.bcpg.SymmetricKeyAlgorithmTags;
+import org.spongycastle.crypto.BufferedBlockCipher;
+import org.spongycastle.crypto.CipherParameters;
+import org.spongycastle.crypto.engines.AESEngine;
+import org.spongycastle.crypto.modes.CBCBlockCipher;
+import org.spongycastle.crypto.paddings.BlockCipherPadding;
+import org.spongycastle.crypto.paddings.PKCS7Padding;
+import org.spongycastle.crypto.paddings.PaddedBufferedBlockCipher;
+import org.spongycastle.crypto.params.KeyParameter;
 import org.spongycastle.jce.provider.BouncyCastleProvider;
 import org.spongycastle.openpgp.PGPEncryptedData;
 import org.spongycastle.openpgp.PGPException;
@@ -21,6 +30,7 @@ import org.spongycastle.openpgp.operator.jcajce.JcePBESecretKeyEncryptorBuilder;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -28,6 +38,10 @@ import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.util.Date;
+
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 import gov.anl.coar.meg.Constants;
 
@@ -110,6 +124,16 @@ public class KeyGenerationLogic {
         PGPPublicKey publicKey = cache.getSecretKey().getPublicKey();
         MEGRevocationKey revocationKey = MEGRevocationKey.generate(publicKey, cache.getPrivateKey(), REVOCATION_DESCRIPTION);
         revocationKey.toFile(context);
+    }
+
+    public void generateSymmetricKey(
+            Context context
+    ) {
+        // TODO generate AES symmetric key based off information in phone.
+        //
+        // TODO need to know if storing these things in file is ok. Technically
+        // TODO it could be broken into. So then the best thing you can probably
+        // TODO do is just to keep the key in memory and regenerate when necessary.
     }
 
     private void writeRings(

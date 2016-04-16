@@ -217,7 +217,7 @@ public class Installation extends AppCompatActivity
         }
         // TODO the error warning presents below the ? icon on android. We should
         // TODO probably remove the ? icon
-        if (password.toString().isEmpty()) {
+        if (password.isEmpty()) {
             etPassword.setError("Enter a password!");
             throwNotValidatedError = true;
         }

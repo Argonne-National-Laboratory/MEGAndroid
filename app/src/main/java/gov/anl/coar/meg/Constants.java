@@ -15,6 +15,7 @@ public class Constants {
     public static final String SPONGY_CASTLE = "SC";
 
     public static final String SECRETKEYRING_FILENAME = "secret.skr";
+    public static final String SYMMETRICKEY_META_FILENAME = "symmetric.dat";
     public static final String PUBLICKEYRING_FILENAME = "pub.asc";
     public static final String REVOCATIONKEY_FILENAME = "revocation.asc";
     public static final String PHONENUMBER_FILENAME = "phone_number.txt";
