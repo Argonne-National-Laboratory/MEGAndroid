@@ -120,6 +120,15 @@ public class Util {
         return out;
     }
 
+    /**
+     * Write the IV of the AES key to file.
+     *
+     * TODO Is this a security problem in itself?
+     *
+     * @param context
+     * @param dataBytes
+     * @throws IOException
+     */
     public static void writeSymmetricMetadataFile(
             Context context,
             byte[] dataBytes

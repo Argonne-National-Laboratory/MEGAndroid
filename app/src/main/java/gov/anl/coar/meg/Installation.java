@@ -123,7 +123,7 @@ public class Installation extends AppCompatActivity
         builder.setMessage(R.string.install_alert_msg);
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                startActivity(new Intent(((Dialog) dialog).getContext(), Login.class));
+                startActivity(new Intent(((Dialog) dialog).getContext(), ScanQRActivity.class));
             }
         });
         return builder.create();

@@ -9,14 +9,13 @@
 package gov.anl.coar.meg;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.hardware.Camera;
 import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.PreviewCallback;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.View;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -26,11 +25,7 @@ import net.sourceforge.zbar.ImageScanner;
 import net.sourceforge.zbar.Symbol;
 import net.sourceforge.zbar.SymbolSet;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-
-import gov.anl.coar.meg.pgp.KeyGenerationLogic;
 
 
 /**
@@ -110,6 +105,7 @@ public class ScanQRActivity extends Activity{
             barcode.setData(data);
 
             int result = scanner.scanImage(barcode);
+            boolean scanSuccess = false;
 
             if (result != 0) {
                 previewing = false;
@@ -118,16 +114,22 @@ public class ScanQRActivity extends Activity{
 
                 SymbolSet syms = scanner.getResults();
                 for (Symbol sym : syms) {
+                    // Gets the IV from the QR code.
+                    //
+                    // TODO this is not exactly a super secure implementation.
                     scanText.setText("Processing ...");
                     // TODO Validate it can be an AES key first
                     try {
                         Util.writeSymmetricMetadataFile(getApplicationContext(), sym.getDataBytes());
+                        scanSuccess = true;
                     } catch (IOException e) {
                         scanText.setText("Something went wrong. Try again.");
                         e.printStackTrace();
                     }
-                    // TODO Redirect to login screen.
                 }
+            }
+            if (scanSuccess) {
+                startActivity(new Intent(getApplicationContext(), Login.class));
             }
         }
     };

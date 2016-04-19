@@ -36,7 +36,11 @@ public class EnterPasswordDialog extends DialogFragment{
                             PrivateKeyCache cache = (PrivateKeyCache) getActivity().getApplication();
                             char[] password = etLoginPassword.getText().toString().toCharArray();
                             cache.refreshPK(getActivity(), password);
-                            startActivity(new Intent(getActivity(), Login.class));
+                            if (!Util.doesSymmetricKeyExist(getActivity())) {
+                                startActivity(new Intent(getActivity(), ScanQRActivity.class));
+                            } else {
+                                startActivity(new Intent(getActivity(), Login.class));
+                            }
                         } catch (Exception e) {
                             FragmentManager fm = getFragmentManager();
                             new RetryPasswordDialog().show(fm, "bar");

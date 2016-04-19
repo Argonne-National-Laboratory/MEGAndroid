@@ -89,12 +89,12 @@ public class MainActivity extends FragmentActivity
                 PrivateKeyCache cache = (PrivateKeyCache) getApplication();
                 if (!new Util().doesSecretKeyExist(this)) {
                     bLogin.setError(Constants.LOGIN_BUT_NO_KEY);
-                } else if (!Util.doesSymmetricKeyExist(this)){
-                    startActivity(new Intent(this, ScanQRActivity.class));
                 } else if (cache.needsRefresh()) {
                     FragmentManager fm = getFragmentManager();
                     EnterPasswordDialog epd = new EnterPasswordDialog();
                     epd.show(fm, TAG);
+                } else if (!Util.doesSymmetricKeyExist(this) && !cache.needsRefresh()) {
+                    startActivity(new Intent(this, ScanQRActivity.class));
                 } else {
                     startActivity(new Intent(this, Login.class));
                 }
