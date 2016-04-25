@@ -25,8 +25,6 @@ import net.sourceforge.zbar.ImageScanner;
 import net.sourceforge.zbar.Symbol;
 import net.sourceforge.zbar.SymbolSet;
 
-import java.io.IOException;
-
 
 /**
  * Created by greg on 4/15/16.
@@ -114,15 +112,12 @@ public class ScanQRActivity extends Activity{
 
                 SymbolSet syms = scanner.getResults();
                 for (Symbol sym : syms) {
-                    // Gets the IV from the QR code.
-                    //
-                    // TODO this is not exactly a super secure implementation.
                     scanText.setText("Processing ...");
-                    // TODO Validate it can be an AES key first
                     try {
+                        Util.validateSymmetricKeyData(sym.getData());
                         Util.writeSymmetricMetadataFile(getApplicationContext(), sym.getDataBytes());
                         scanSuccess = true;
-                    } catch (IOException e) {
+                    } catch (Exception e) {
                         scanText.setText("Something went wrong. Try again.");
                         e.printStackTrace();
                     }

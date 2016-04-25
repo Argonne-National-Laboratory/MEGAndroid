@@ -35,4 +35,7 @@ public class Constants {
     public static final long NO_REGISTRATION_RETRY_TIMEOUT = 20;
     public static final long NO_PUBLIC_KEY_RETRY_TIMEOUT = 5;
 
+    public static final int AES_KEY_BYTES = 32;  // AES 256
+    public static final int AES_IV_BYTES = 16;  // AES*
+    public static final String SYMMETRIC_KEY_FIELD_DELIMETER = "&&";
 }

@@ -5,16 +5,20 @@ import android.content.Context;
 import org.spongycastle.bcpg.ArmoredOutputStream;
 import org.spongycastle.openpgp.PGPPublicKey;
 import org.spongycastle.openpgp.PGPSignature;
+import org.spongycastle.util.encoders.Base64;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 /**
@@ -123,8 +127,6 @@ public class Util {
     /**
      * Write the IV of the AES key to file.
      *
-     * TODO Is this a security problem in itself?
-     *
      * @param context
      * @param dataBytes
      * @throws IOException
@@ -139,5 +141,36 @@ public class Util {
         FileOutputStream stream = new FileOutputStream(file.getPath());
         stream.write(dataBytes);
         stream.close();
+    }
+
+    public static ArrayList<byte[]> getAESKeyData(
+            Context context
+    )
+            throws IOException
+    {
+        File file = new File(context.getFilesDir(), Constants.SYMMETRICKEY_META_FILENAME);
+        FileInputStream in = new FileInputStream(file);
+        String [] dataArray = inputBufferToString(in).split("&&");
+        in.close();
+        ArrayList<byte[]> response = new ArrayList<>(2);
+        response.add(Base64.decode(dataArray[0]));  // the key data
+        response.add(Base64.decode(dataArray[1]));  // the iv
+        return response;
+    }
+
+    public static void validateSymmetricKeyData(
+            String data
+    )
+            throws Exception
+    {
+        String [] dataArray = data.split(Constants.SYMMETRIC_KEY_FIELD_DELIMETER);
+        if (dataArray.length != 2) {
+            throw new Exception("Invalid number of fields in symmetric key data!");
+        }
+        if (Base64.decode(dataArray[0]).length != Constants.AES_KEY_BYTES) {
+            throw new Exception("Invalid number of key bytes");
+        } else if (Base64.decode(dataArray[1]).length != Constants.AES_IV_BYTES) {
+            throw new Exception("Invalid number of iv bytes");
+        }
     }
 }

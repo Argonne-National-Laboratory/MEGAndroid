@@ -69,8 +69,7 @@ public class MainActivity extends FragmentActivity
             mInstanceIdIntent.putExtra("receiver", mReceiver);
             startService(mInstanceIdIntent);
         } else {
-            // TODO Some kind of warning to do something to set up google
-            // TODO play services
+            // TODO Some kind of warning to do something to set up google play services
         }
     }
 
