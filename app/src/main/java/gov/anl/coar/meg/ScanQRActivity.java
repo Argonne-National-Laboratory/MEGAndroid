@@ -115,7 +115,7 @@ public class ScanQRActivity extends Activity{
                     scanText.setText("Processing ...");
                     try {
                         Util.validateSymmetricKeyData(sym.getData());
-                        Util.writeSymmetricMetadataFile(getApplicationContext(), sym.getDataBytes());
+                        Util.writeSymmetricMetadataFile(getApplicationContext(), sym.getData());
                         scanSuccess = true;
                     } catch (Exception e) {
                         scanText.setText("Something went wrong. Try again.");

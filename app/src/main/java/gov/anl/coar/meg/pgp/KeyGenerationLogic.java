@@ -13,6 +13,7 @@ import org.spongycastle.crypto.paddings.BlockCipherPadding;
 import org.spongycastle.crypto.paddings.PKCS7Padding;
 import org.spongycastle.crypto.paddings.PaddedBufferedBlockCipher;
 import org.spongycastle.crypto.params.KeyParameter;
+import org.spongycastle.crypto.params.ParametersWithIV;
 import org.spongycastle.jce.provider.BouncyCastleProvider;
 import org.spongycastle.openpgp.PGPEncryptedData;
 import org.spongycastle.openpgp.PGPException;
@@ -37,6 +38,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.security.Security;
+import java.util.ArrayList;
 import java.util.Date;
 
 import javax.crypto.KeyGenerator;
@@ -44,6 +46,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import gov.anl.coar.meg.Constants;
+import gov.anl.coar.meg.Util;
 
 /**
  * Created by greg on 3/8/16.
@@ -126,14 +129,27 @@ public class KeyGenerationLogic {
         revocationKey.toFile(context);
     }
 
-    public void generateSymmetricKey(
-            Context context
-    ) {
-        // TODO generate AES symmetric key based off information in phone.
-        //
-        // TODO need to know if storing these things in file is ok. Technically
-        // TODO it could be broken into. So then the best thing you can probably
-        // TODO do is just to keep the key in memory and regenerate when necessary.
+    /**
+     * Generate a Symmetric Key based on the data that we have stored in the phone
+     *
+     * @param context
+     * @return
+     * @throws IOException
+     */
+    public BufferedBlockCipher generateSymmetricKey(
+            Context context,
+            boolean forEncryption
+    )
+            throws IOException
+    {
+        ArrayList<byte[]> data = Util.getAESKeyData(context);
+        KeyParameter keyParam = new KeyParameter(data.get(0));
+        CipherParameters params = new ParametersWithIV(keyParam, data.get(1));
+        BlockCipherPadding padding = new PKCS7Padding();
+        BufferedBlockCipher cipher = new PaddedBufferedBlockCipher(new CBCBlockCipher(new AESEngine()), padding);
+        cipher.reset();
+        cipher.init(forEncryption, params);
+        return cipher;
     }
 
     private void writeRings(

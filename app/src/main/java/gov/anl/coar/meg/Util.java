@@ -128,18 +128,18 @@ public class Util {
      * Write the IV of the AES key to file.
      *
      * @param context
-     * @param dataBytes
+     * @param data
      * @throws IOException
      */
     public static void writeSymmetricMetadataFile(
             Context context,
-            byte[] dataBytes
+            String data
     )
             throws IOException
     {
         File file = new File(context.getFilesDir(), Constants.SYMMETRICKEY_META_FILENAME);
         FileOutputStream stream = new FileOutputStream(file.getPath());
-        stream.write(dataBytes);
+        stream.write(data.getBytes());
         stream.close();
     }
 

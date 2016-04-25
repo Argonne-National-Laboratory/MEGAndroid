@@ -1,8 +1,11 @@
 package gov.anl.coar.meg.pgp;
 
 import android.app.Application;
+import android.content.Context;
 import android.util.Log;
 
+import org.spongycastle.crypto.BufferedBlockCipher;
+import org.spongycastle.crypto.InvalidCipherTextException;
 import org.spongycastle.jce.provider.BouncyCastleProvider;
 import org.spongycastle.openpgp.PGPCompressedData;
 import org.spongycastle.openpgp.PGPCompressedDataGenerator;
@@ -22,6 +25,7 @@ import org.spongycastle.openpgp.operator.jcajce.JcePublicKeyDataDecryptorFactory
 import org.spongycastle.openpgp.operator.jcajce.JcePublicKeyKeyEncryptionMethodGenerator;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,6 +33,8 @@ import java.io.OutputStream;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.util.Date;
+
+import javax.crypto.KeyGenerator;
 
 import gov.anl.coar.meg.Constants;
 import gov.anl.coar.meg.Util;
@@ -97,17 +103,41 @@ public class EncryptionLogic {
     }
 
     public InputStream decryptMessageWithSymKey(
+            Context context,
             InputStream buffer
-    ) {
-        // stub method
-        return buffer;
+    )
+            throws IOException, InvalidCipherTextException
+    {
+        return performSymmetricKeyAction(context, buffer, false);
     }
 
     public BufferedInputStream encryptMessageWithSymKey(
+            Context context,
             InputStream buffer
-    ) {
-        // just a stub
-        return (BufferedInputStream) buffer;
+    )
+            throws IOException, InvalidCipherTextException
+    {
+        return performSymmetricKeyAction(context, buffer, true);
+    }
+
+    private BufferedInputStream performSymmetricKeyAction(
+            Context context,
+            InputStream buffer,
+            boolean isEncryption
+    )
+            throws IOException, InvalidCipherTextException
+    {
+        KeyGenerationLogic keygen = new KeyGenerationLogic();
+        BufferedBlockCipher cipher = keygen.generateSymmetricKey(context, isEncryption);
+        byte[] bytesIn = Util.inputStreamToOutputStream(buffer).toByteArray();
+        int buflen = cipher.getOutputSize(bytesIn.length);
+        byte[] bytesOut = new byte[buflen];
+        int nBytesEnc = cipher.processBytes(bytesIn, 0, bytesIn.length, bytesOut, 0);
+        nBytesEnc += cipher.doFinal(bytesOut, nBytesEnc);
+        if (nBytesEnc != bytesOut.length) {
+            throw new IllegalStateException("Unexpected behaviour : getOutputSize value incorrect");
+        }
+        return new BufferedInputStream(new ByteArrayInputStream(bytesOut));
     }
 
     public ByteArrayOutputStream encryptMessageWithPubKey(
