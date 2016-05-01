@@ -132,15 +132,13 @@ public class EncryptionLogic {
         KeyGenerationLogic keygen = new KeyGenerationLogic();
         BufferedBlockCipher cipher = keygen.generateSymmetricKey(context, isEncryption);
         // Data will come in as base64 encoded.
-        byte [] bytesIn = Base64.decode(Util.inputBufferToString(buffer).getBytes("ISO-8859-1"));
+        byte [] bytesIn = Base64.decode(Util.inputStreamToOutputStream(buffer).toByteArray());
+        buffer.close();
         int buflen = cipher.getOutputSize(bytesIn.length);
         byte[] bytesOut = new byte[buflen];
         int nBytesEnc = cipher.processBytes(bytesIn, 0, bytesIn.length, bytesOut, 0);
-        nBytesEnc += cipher.doFinal(bytesOut, nBytesEnc);
-        if (nBytesEnc != bytesOut.length) {
-            throw new IllegalStateException("Unexpected behaviour : getOutputSize value incorrect");
-        }
-        // Now re-encode in Base64 and then send back to server.
+        cipher.doFinal(bytesOut, nBytesEnc);
+        // Now re-encode in Base64. Do we want to do this in the case of decryption??
         return new BufferedInputStream(new ByteArrayInputStream(Base64.encode(bytesOut)));
     }
 
