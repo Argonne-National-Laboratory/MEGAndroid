@@ -45,7 +45,7 @@ public class GCMListenerService extends GcmListenerService {
             MEGServerRequest request = new MEGServerRequest();
             InputStream response = request.getDecryptedMessage(messageId);
             EncryptionLogic logic = new EncryptionLogic();
-            InputStream clear = logic.decryptMessageWithSymKey(response);
+            InputStream clear = logic.decryptMessageWithSymKey(this, response);
             InputStream pubkeyStream = request.getAssociatedPublicKey(messageId);
             PGPPublicKey pubKey = MEGPublicKeyRing.fromInputStream(pubkeyStream).getMasterPublicKey();
             ByteArrayOutputStream inter = logic.encryptMessageWithPubKey(clear, pubKey);
@@ -64,7 +64,7 @@ public class GCMListenerService extends GcmListenerService {
             InputStream response = request.getEncryptedMessage(messageId);
             EncryptionLogic logic = new EncryptionLogic();
             BufferedInputStream decBuffer = logic.decryptMessageWithPK(response, getApplication());
-            InputStream symInBuffer = logic.encryptMessageWithSymKey(decBuffer);
+            InputStream symInBuffer = logic.encryptMessageWithSymKey(this, decBuffer);
             request.putDecryptedMessage(messageId, symInBuffer);
         } catch (Exception e) {
             e.printStackTrace();

@@ -23,6 +23,7 @@ import org.spongycastle.openpgp.jcajce.JcaPGPObjectFactory;
 import org.spongycastle.openpgp.operator.jcajce.JcePGPDataEncryptorBuilder;
 import org.spongycastle.openpgp.operator.jcajce.JcePublicKeyDataDecryptorFactoryBuilder;
 import org.spongycastle.openpgp.operator.jcajce.JcePublicKeyKeyEncryptionMethodGenerator;
+import org.spongycastle.util.encoders.Base64;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -127,9 +128,11 @@ public class EncryptionLogic {
     )
             throws IOException, InvalidCipherTextException
     {
+        // TODO in the future we can cache the symmetric key
         KeyGenerationLogic keygen = new KeyGenerationLogic();
         BufferedBlockCipher cipher = keygen.generateSymmetricKey(context, isEncryption);
-        byte[] bytesIn = Util.inputStreamToOutputStream(buffer).toByteArray();
+        // Data will come in as base64 encoded.
+        byte [] bytesIn = Base64.decode(Util.inputBufferToString(buffer).getBytes("ISO-8859-1"));
         int buflen = cipher.getOutputSize(bytesIn.length);
         byte[] bytesOut = new byte[buflen];
         int nBytesEnc = cipher.processBytes(bytesIn, 0, bytesIn.length, bytesOut, 0);
@@ -137,7 +140,8 @@ public class EncryptionLogic {
         if (nBytesEnc != bytesOut.length) {
             throw new IllegalStateException("Unexpected behaviour : getOutputSize value incorrect");
         }
-        return new BufferedInputStream(new ByteArrayInputStream(bytesOut));
+        // Now re-encode in Base64 and then send back to server.
+        return new BufferedInputStream(new ByteArrayInputStream(Base64.encode(bytesOut)));
     }
 
     public ByteArrayOutputStream encryptMessageWithPubKey(

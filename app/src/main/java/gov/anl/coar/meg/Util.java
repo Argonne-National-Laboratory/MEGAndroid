@@ -16,6 +16,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -138,9 +139,9 @@ public class Util {
             throws IOException
     {
         File file = new File(context.getFilesDir(), Constants.SYMMETRICKEY_META_FILENAME);
-        FileOutputStream stream = new FileOutputStream(file.getPath());
-        stream.write(data.getBytes());
-        stream.close();
+        PrintWriter out = new PrintWriter(file);
+        out.println(data);
+        out.close();
     }
 
     public static ArrayList<byte[]> getAESKeyData(
@@ -150,7 +151,7 @@ public class Util {
     {
         File file = new File(context.getFilesDir(), Constants.SYMMETRICKEY_META_FILENAME);
         FileInputStream in = new FileInputStream(file);
-        String [] dataArray = inputBufferToString(in).split("&&");
+        String [] dataArray = inputBufferToString(in).split(Constants.SYMMETRIC_KEY_FIELD_DELIMETER);
         in.close();
         ArrayList<byte[]> response = new ArrayList<>(2);
         response.add(Base64.decode(dataArray[0]));  // the key data
