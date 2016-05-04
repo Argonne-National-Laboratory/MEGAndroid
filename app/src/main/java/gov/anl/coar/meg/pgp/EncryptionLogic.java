@@ -71,7 +71,7 @@ public class EncryptionLogic {
             else
                 encrypted = (PGPEncryptedDataList) pgpFactory.nextObject();
             PrivateKeyCache pkCache = (PrivateKeyCache) application;
-            // XXX TODO I haven't quite figured out what to do if the PK isn't cached
+            // Are there additional things we can do like put an error on the screen?
             if (pkCache.needsRefresh())
                 throw new IllegalArgumentException("Private key is not cached. Cannot decrypt message");
             // TODO Should only be encrypted with one public key right??

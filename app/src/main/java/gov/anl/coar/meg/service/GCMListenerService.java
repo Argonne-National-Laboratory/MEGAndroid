@@ -5,7 +5,9 @@ import android.util.Log;
 
 import com.google.android.gms.gcm.GcmListenerService;
 
+import org.json.JSONObject;
 import org.spongycastle.openpgp.PGPPublicKey;
+import org.spongycastle.util.encoders.Base64;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -43,14 +45,19 @@ public class GCMListenerService extends GcmListenerService {
     ) {
         try {
             MEGServerRequest request = new MEGServerRequest();
-            InputStream response = request.getDecryptedMessage(messageId);
-            EncryptionLogic logic = new EncryptionLogic();
-            InputStream clear = logic.decryptMessageWithSymKey(this, response);
+            // TODO This logic is clunky. We should replace server logic to just get
+            // TODO a base64 encoded message in a JSON blob. But for now... time.
             InputStream pubkeyStream = request.getAssociatedPublicKey(messageId);
+            JSONObject getResponse = request.getDecryptedMessage(messageId);
+            EncryptionLogic logic = new EncryptionLogic();
+            InputStream message = new ByteArrayInputStream(Base64.decode(getResponse.getString("message")));
+            InputStream clear = logic.decryptMessageWithSymKey(this, message);
             PGPPublicKey pubKey = MEGPublicKeyRing.fromInputStream(pubkeyStream).getMasterPublicKey();
             ByteArrayOutputStream inter = logic.encryptMessageWithPubKey(clear, pubKey);
             ByteArrayInputStream enc = new ByteArrayInputStream(inter.toByteArray());
-            request.putEncryptedMessage(messageId, enc);
+            request.putEncryptedMessage(
+                    getResponse.getString("email_to"), getResponse.getString("email_from"), enc
+            );
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -61,11 +68,14 @@ public class GCMListenerService extends GcmListenerService {
     ) {
         try {
             MEGServerRequest request = new MEGServerRequest();
-            InputStream response = request.getEncryptedMessage(messageId);
+            JSONObject getResponse = request.getDecryptedMessage(messageId);
             EncryptionLogic logic = new EncryptionLogic();
-            BufferedInputStream decBuffer = logic.decryptMessageWithPK(response, getApplication());
+            InputStream message = new ByteArrayInputStream(Base64.decode(getResponse.getString("message")));
+            BufferedInputStream decBuffer = logic.decryptMessageWithPK(message, getApplication());
             InputStream symInBuffer = logic.encryptMessageWithSymKey(this, decBuffer);
-            request.putDecryptedMessage(messageId, symInBuffer);
+            request.putDecryptedMessage(
+                    getResponse.getString("email_to"), getResponse.getString("email_from"), symInBuffer
+            );
         } catch (Exception e) {
             e.printStackTrace();
         }

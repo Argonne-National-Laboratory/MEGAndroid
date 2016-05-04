@@ -30,7 +30,7 @@ public class Constants {
     public static final String PUT_MESSAGE_CONTENT_TYPE = "application/octet-stream";
     public static final String TO_CLIENT_ACTION = "toclient";
     public static final long HTTP_RETRY_TIMEOUT = 5;
-    public static final int HTTP_MAX_RETRIES = 100;
+    public static final int HTTP_MAX_RETRIES = 10;
 
     public static final long NO_REGISTRATION_RETRY_TIMEOUT = 20;
     public static final long NO_PUBLIC_KEY_RETRY_TIMEOUT = 5;

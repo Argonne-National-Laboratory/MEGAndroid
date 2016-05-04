@@ -6,6 +6,8 @@ import android.util.Log;
 
 import com.github.kevinsawicki.http.HttpRequest;
 
+import org.json.JSONObject;
+
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
@@ -31,7 +33,7 @@ public class MEGServerRequest {
     private int mMaxRetries = Constants.HTTP_MAX_RETRIES;
     private long mRetryTimeout = Constants.HTTP_RETRY_TIMEOUT;
 
-    public InputStream getDecryptedMessage(
+    public JSONObject getDecryptedMessage(
             String messageId
     )
         throws Exception
@@ -40,7 +42,7 @@ public class MEGServerRequest {
         return getMessage(mServerUrl + DECRYPTED_MSG_URL, messageId);
     }
 
-    public InputStream getEncryptedMessage(
+    public JSONObject getEncryptedMessage(
             String messageId
     )
             throws Exception
@@ -50,28 +52,31 @@ public class MEGServerRequest {
     }
 
     public void putEncryptedMessage(
-            String messageId,
+            String email_to,
+            String email_from,
             InputStream inBuffer
     )
             throws Exception
     {
         mCurRetries = 0;
-        putMessage(mServerUrl + ENCRYPTED_MSG_URL, messageId, inBuffer);
+        putMessage(mServerUrl + ENCRYPTED_MSG_URL, email_to, email_from, inBuffer);
     }
 
     public void putDecryptedMessage(
-            String messageId,
+            String email_to,
+            String email_from,
             InputStream inBuffer
     )
             throws Exception
     {
         mCurRetries = 0;
-        putMessage(mServerUrl + DECRYPTED_MSG_URL, messageId, inBuffer);
+        putMessage(mServerUrl + DECRYPTED_MSG_URL, email_to, email_from, inBuffer);
     }
 
     private void putMessage(
             String url,
-            String messageId,
+            String email_to,
+            String email_from,
             InputStream inBuffer
     )
             throws Exception
@@ -79,7 +84,9 @@ public class MEGServerRequest {
         Log.d(TAG, "put new message on server @ url: " + url);
         try {
             HttpRequest request = HttpRequest.put(
-                    url, true, "associated_message_id", messageId,
+                    url, true,
+                    "email_to", email_to,
+                    "email_from", email_from,
                     "action", Constants.TO_CLIENT_ACTION
             );
             request = request.header("Content-Type", Constants.PUT_MESSAGE_CONTENT_TYPE);
@@ -88,13 +95,14 @@ public class MEGServerRequest {
                 return;
         } catch(Exception e) {}  // Likely connection problem
         if (mCurRetries < mMaxRetries) {
+            mCurRetries += 1;
             TimeUnit.SECONDS.sleep(mRetryTimeout);
-            putMessage(url, messageId, inBuffer);
+            putMessage(url, email_to, email_from, inBuffer);
         }
         throw new Exception("Something went wrong. We could not put the message back onto the server");
     }
 
-    private InputStream getMessage(
+    private JSONObject getMessage(
             String url,
             String messageId
     )
@@ -103,11 +111,11 @@ public class MEGServerRequest {
         Log.d(TAG, "Get encrypted message from url: " + url + " with id: " + messageId);
         try {
             HttpRequest response = HttpRequest.get(url, true, "message_id", messageId);
-            // TODO What do we do in the case of stuff like 404 errors?
             if (response.ok())
-                return response.stream();
+                return new JSONObject(response.body());
         } catch(Exception e) {}  // Likely connection problem
         if (mCurRetries < mMaxRetries) {
+            mCurRetries += 1;
             TimeUnit.SECONDS.sleep(mRetryTimeout);
             return getMessage(url, messageId);
         }
@@ -191,6 +199,7 @@ public class MEGServerRequest {
                 return response.stream();
         } catch(Exception e) {}  // Likely ConnectionError
         if (mCurRetries < mMaxRetries) {
+            mCurRetries += 1;
             TimeUnit.SECONDS.sleep(mRetryTimeout);
             return getAssociatedPublicKey(messageId);
         }
