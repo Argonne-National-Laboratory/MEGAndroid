@@ -27,7 +27,7 @@ public class Constants {
     public static final String MEG_API_URL = "http://grehm.us/megserver";
     // Just use this for debugging if we don't want to hit the server
     //public static final String MEG_API_URL = "http://foobar";
-    public static final String PUT_MESSAGE_CONTENT_TYPE = "application/octet-stream";
+    public static final String PUT_MESSAGE_CONTENT_TYPE = "text/plain; charset=us-ascii";
     public static final String TO_CLIENT_ACTION = "toclient";
     public static final long HTTP_RETRY_TIMEOUT = 5;
     public static final int HTTP_MAX_RETRIES = 10;

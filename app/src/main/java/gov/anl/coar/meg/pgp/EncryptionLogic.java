@@ -103,7 +103,7 @@ public class EncryptionLogic {
         throw new IllegalArgumentException("Unable to decrypt message.");
     }
 
-    public InputStream decryptMessageWithSymKey(
+    public ByteArrayInputStream decryptMessageWithSymKey(
             Context context,
             InputStream buffer
     )
@@ -112,7 +112,7 @@ public class EncryptionLogic {
         return performSymmetricKeyAction(context, buffer, false);
     }
 
-    public BufferedInputStream encryptMessageWithSymKey(
+    public ByteArrayInputStream encryptMessageWithSymKey(
             Context context,
             InputStream buffer
     )
@@ -121,7 +121,7 @@ public class EncryptionLogic {
         return performSymmetricKeyAction(context, buffer, true);
     }
 
-    private BufferedInputStream performSymmetricKeyAction(
+    private ByteArrayInputStream performSymmetricKeyAction(
             Context context,
             InputStream buffer,
             boolean isEncryption
@@ -131,15 +131,13 @@ public class EncryptionLogic {
         // TODO in the future we can cache the symmetric key
         KeyGenerationLogic keygen = new KeyGenerationLogic();
         BufferedBlockCipher cipher = keygen.generateSymmetricKey(context, isEncryption);
-        // Data will come in as base64 encoded.
-        byte [] bytesIn = Base64.decode(Util.inputStreamToOutputStream(buffer).toByteArray());
+        byte [] bytesIn = Util.inputStreamToOutputStream(buffer).toByteArray();
         buffer.close();
         int buflen = cipher.getOutputSize(bytesIn.length);
         byte[] bytesOut = new byte[buflen];
         int nBytesEnc = cipher.processBytes(bytesIn, 0, bytesIn.length, bytesOut, 0);
         cipher.doFinal(bytesOut, nBytesEnc);
-        // Now re-encode in Base64. Do we want to do this in the case of decryption??
-        return new BufferedInputStream(new ByteArrayInputStream(Base64.encode(bytesOut)));
+        return new ByteArrayInputStream(bytesOut);
     }
 
     public ByteArrayOutputStream encryptMessageWithPubKey(
