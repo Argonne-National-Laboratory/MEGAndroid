@@ -4,7 +4,6 @@ import android.app.Application;
 import android.content.Context;
 
 import org.spongycastle.bcpg.HashAlgorithmTags;
-import org.spongycastle.bcpg.SymmetricKeyAlgorithmTags;
 import org.spongycastle.crypto.BufferedBlockCipher;
 import org.spongycastle.crypto.CipherParameters;
 import org.spongycastle.crypto.engines.AESEngine;
@@ -31,19 +30,15 @@ import org.spongycastle.openpgp.operator.jcajce.JcePBESecretKeyEncryptorBuilder;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.security.Security;
 import java.util.ArrayList;
 import java.util.Date;
-
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 
 import gov.anl.coar.meg.Constants;
 import gov.anl.coar.meg.Util;
@@ -69,6 +64,8 @@ public class KeyGenerationLogic {
         // Make the algorithm configurable in the future
         KeyPairGenerator kpg = KeyPairGenerator.getInstance(Constants.RSA, Constants.SPONGY_CASTLE);
         // Probably can make number of bytes configurable in the futue
+        // TODO supposedly there is a security vulnerability in SecureRandom. You should
+        // TODO fix this before it goes to production.
         kpg.initialize(Constants.ENCRYPTION_BITS, new SecureRandom());
         KeyPair keyPair = kpg.generateKeyPair();
         if (keyPair == null) {
@@ -129,22 +126,48 @@ public class KeyGenerationLogic {
         revocationKey.toFile(context);
     }
 
+    public ArrayList generateRandomKeyAndIV()
+            throws NoSuchAlgorithmException
+    {
+        ArrayList<byte[]> data = new ArrayList<byte[]>();
+        SecureRandom random = new SecureRandom();
+        byte[] randKey = new byte[Constants.AES_KEY_BYTES];
+        byte[] randIV = new byte[Constants.AES_IV_BYTES];
+        random.nextBytes(randKey);
+        random.nextBytes(randIV);
+        MessageDigest sha256Digest = MessageDigest.getInstance(Constants.SHA_256);
+        MessageDigest md5Digest = MessageDigest.getInstance(Constants.MD5);
+        data.add(sha256Digest.digest(randKey));
+        data.add(md5Digest.digest(randIV));
+        return data;
+    }
+
     /**
-     * Generate a Symmetric Key based on the data that we have stored in the phone
+     * Generate a Symmetric Key based on the data that we have stored in the QR code
      *
      * @param context
      * @return
      * @throws IOException
      */
-    public BufferedBlockCipher generateSymmetricKey(
+    public BufferedBlockCipher generateSymmetricKeyFromQRData(
             Context context,
             boolean forEncryption
     )
             throws IOException
     {
         ArrayList<byte[]> data = Util.getAESKeyData(context);
-        KeyParameter keyParam = new KeyParameter(data.get(0));
-        CipherParameters params = new ParametersWithIV(keyParam, data.get(1));
+        return generateSymmetricKey(data.get(0), data.get(1), forEncryption);
+    }
+
+    public BufferedBlockCipher generateSymmetricKey(
+            byte[] keyBytes,
+            byte[] ivBytes,
+            boolean forEncryption
+    )
+            throws IOException
+    {
+        KeyParameter keyParam = new KeyParameter(keyBytes);
+        CipherParameters params = new ParametersWithIV(keyParam, ivBytes);
         BlockCipherPadding padding = new PKCS7Padding();
         BufferedBlockCipher cipher = new PaddedBufferedBlockCipher(new CBCBlockCipher(new AESEngine()), padding);
         cipher.reset();

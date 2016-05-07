@@ -38,4 +38,7 @@ public class Constants {
     public static final int AES_KEY_BYTES = 32;  // AES 256
     public static final int AES_IV_BYTES = 16;  // AES*
     public static final String SYMMETRIC_KEY_FIELD_DELIMETER = "&&";
+
+    public static final String SHA_256 = "SHA-256";
+    public static final String MD5 = "MD5";
 }

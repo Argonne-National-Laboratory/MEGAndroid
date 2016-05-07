@@ -14,7 +14,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 import gov.anl.coar.meg.Util;
 import gov.anl.coar.meg.http.MEGServerRequest;
@@ -54,12 +53,14 @@ public class GCMListenerService extends GcmListenerService {
             JSONObject getResponse = request.getDecryptedMessage(messageId);
             EncryptionLogic logic = new EncryptionLogic();
             InputStream message = new ByteArrayInputStream(Base64.decode(getResponse.getString("message")));
-            InputStream clear = logic.decryptMessageWithSymKey(this, message);
+            InputStream clear = logic.decryptClientSymmetricData(this, message);
             PGPPublicKey pubKey = MEGPublicKeyRing.fromInputStream(pubkeyStream).getMasterPublicKey();
-            ByteArrayOutputStream out = logic.encryptMessageWithPubKey(clear, pubKey);
+            ByteArrayOutputStream out = logic.pgpEncrypt(clear, pubKey);
+            // TODO DEBUG
             byte[] bytes = Base64.encode(out.toByteArray());
-            Log.i(TAG, "send new encrypted: " + new String(bytes, Charset.forName("US-ASCII")));
+            Log.i(TAG, "send new encrypted: " + new String(bytes, Charset.forName("UTF-8")));
             ByteArrayInputStream enc = new ByteArrayInputStream(bytes);
+            // TODO END DEBUG
             request.putEncryptedMessage(
                     getResponse.getString("email_to"), getResponse.getString("email_from"), enc
             );
@@ -77,10 +78,18 @@ public class GCMListenerService extends GcmListenerService {
             EncryptionLogic logic = new EncryptionLogic();
             Log.i(TAG, "decrypt message: " + getResponse.getString("message"));
             InputStream message = new ByteArrayInputStream(Base64.decode(getResponse.getString("message")));
-            BufferedInputStream decBuffer = logic.decryptMessageWithPK(message, getApplication());
-            ByteArrayInputStream symInBuffer = logic.encryptMessageWithSymKey(this, decBuffer);
+            ByteArrayInputStream decBuffer = logic.pgpDecrypt(message, getApplication());
+            ByteArrayOutputStream bar = Util.inputStreamToOutputStream(decBuffer);
+            // TODO
+            byte[] arr = bar.toByteArray();
+            Log.i(TAG, "plain: " + new String(arr, Charset.forName("US-ASCII")));
+            ByteArrayInputStream bin = new ByteArrayInputStream(arr);
+            ByteArrayInputStream symInBuffer = logic.encryptAsClientBoundSymmetricData(this, bin);
             ByteArrayOutputStream out = Util.inputStreamToOutputStream(symInBuffer);
-            ByteArrayInputStream decrypted = new ByteArrayInputStream(Base64.encode(out.toByteArray()));
+            byte[] b64encoded = Base64.encode(out.toByteArray());
+            Log.i(TAG, "Send decrypted message: " + new String(b64encoded, Charset.forName("US-ASCII")));
+            ByteArrayInputStream decrypted = new ByteArrayInputStream(b64encoded);
+            // TODO END
             request.putDecryptedMessage(
                     getResponse.getString("email_to"), getResponse.getString("email_from"), decrypted
             );
