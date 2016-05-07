@@ -55,12 +55,9 @@ public class GCMListenerService extends GcmListenerService {
             InputStream message = new ByteArrayInputStream(Base64.decode(getResponse.getString("message")));
             InputStream clear = logic.decryptClientSymmetricData(this, message);
             PGPPublicKey pubKey = MEGPublicKeyRing.fromInputStream(pubkeyStream).getMasterPublicKey();
-            ByteArrayOutputStream out = logic.pgpEncrypt(clear, pubKey);
-            // TODO DEBUG
-            byte[] bytes = Base64.encode(out.toByteArray());
-            Log.i(TAG, "send new encrypted: " + new String(bytes, Charset.forName("UTF-8")));
-            ByteArrayInputStream enc = new ByteArrayInputStream(bytes);
-            // TODO END DEBUG
+            ByteArrayInputStream enc = new ByteArrayInputStream(
+                    Base64.encode(logic.pgpEncrypt(clear, pubKey).toByteArray())
+            );
             request.putEncryptedMessage(
                     getResponse.getString("email_to"), getResponse.getString("email_from"), enc
             );
