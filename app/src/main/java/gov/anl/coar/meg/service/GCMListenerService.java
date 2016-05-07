@@ -9,11 +9,8 @@ import org.json.JSONObject;
 import org.spongycastle.openpgp.PGPPublicKey;
 import org.spongycastle.util.encoders.Base64;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 
 import gov.anl.coar.meg.Util;
 import gov.anl.coar.meg.http.MEGServerRequest;
@@ -73,22 +70,14 @@ public class GCMListenerService extends GcmListenerService {
             MEGServerRequest request = new MEGServerRequest();
             JSONObject getResponse = request.getDecryptedMessage(messageId);
             EncryptionLogic logic = new EncryptionLogic();
-            Log.i(TAG, "decrypt message: " + getResponse.getString("message"));
             InputStream message = new ByteArrayInputStream(Base64.decode(getResponse.getString("message")));
             ByteArrayInputStream decBuffer = logic.pgpDecrypt(message, getApplication());
-            ByteArrayOutputStream bar = Util.inputStreamToOutputStream(decBuffer);
-            // TODO
-            byte[] arr = bar.toByteArray();
-            Log.i(TAG, "plain: " + new String(arr, Charset.forName("US-ASCII")));
-            ByteArrayInputStream bin = new ByteArrayInputStream(arr);
-            ByteArrayInputStream symInBuffer = logic.encryptAsClientBoundSymmetricData(this, bin);
-            ByteArrayOutputStream out = Util.inputStreamToOutputStream(symInBuffer);
-            byte[] b64encoded = Base64.encode(out.toByteArray());
-            Log.i(TAG, "Send decrypted message: " + new String(b64encoded, Charset.forName("US-ASCII")));
-            ByteArrayInputStream decrypted = new ByteArrayInputStream(b64encoded);
-            // TODO END
+            ByteArrayInputStream symInBuffer = logic.encryptAsClientBoundSymmetricData(this, decBuffer);
+            ByteArrayInputStream b64sym = new ByteArrayInputStream(
+                    Base64.encode(Util.inputStreamToOutputStream(symInBuffer).toByteArray())
+            );
             request.putDecryptedMessage(
-                    getResponse.getString("email_to"), getResponse.getString("email_from"), decrypted
+                    getResponse.getString("email_to"), getResponse.getString("email_from"), b64sym
             );
         } catch (Exception e) {
             e.printStackTrace();

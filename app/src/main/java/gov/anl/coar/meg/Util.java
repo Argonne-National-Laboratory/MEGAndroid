@@ -21,8 +21,6 @@ import java.util.Scanner;
 
 /**
  * Created by greg on 2/29/16.
- *
- * Move to util package
  */
 public class Util {
     /**
