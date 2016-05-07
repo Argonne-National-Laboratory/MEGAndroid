@@ -84,8 +84,8 @@ public class EncryptionLogic {
         BufferedInputStream decKeyData = decryptWithPK(new ByteArrayInputStream(encKeyData), application);
         byte[] keyDecBytes  = Util.inputStreamToOutputStream(decKeyData).toByteArray();
         decKeyData.close();
-        byte[] keyBytes = Arrays.copyOfRange(keyDecBytes, 0, 32);
-        byte[] ivBytes = Arrays.copyOfRange(keyDecBytes, 32, keyDecBytes.length);
+        byte[] keyBytes = Arrays.copyOfRange(keyDecBytes, 0, Constants.AES_KEY_BYTES);
+        byte[] ivBytes = Arrays.copyOfRange(keyDecBytes, Constants.AES_KEY_BYTES, keyDecBytes.length);
         BufferedBlockCipher cipher = keygen.generateSymmetricKey(keyBytes, ivBytes, false);
         return performSymmetricKeyAction(cipher, new ByteArrayInputStream(encMsgData));
     }
