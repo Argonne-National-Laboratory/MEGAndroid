@@ -157,7 +157,7 @@ public class EncryptionLogic {
                 throw new IllegalArgumentException("Private key is not cached. Cannot decrypt message");
             // TODO Should only be encrypted with one public key right??
             PGPPublicKeyEncryptedData pbe = (PGPPublicKeyEncryptedData) encrypted.getEncryptedDataObjects().next();
-            Log.d(TAG, "Message intended for id: " + pbe.getKeyID() + " using key id: " + pkCache.getPrivateKey().getKeyID() + " to decrypt");
+            Log.d(TAG, "Message intended for id: " + Long.toHexString(pbe.getKeyID()).toUpperCase() + " using key id: " + Long.toHexString(pkCache.getPrivateKey().getKeyID()).toUpperCase() + " to decrypt");
             InputStream clearText = pbe.getDataStream(
                     new JcePublicKeyDataDecryptorFactoryBuilder().setProvider(Constants.SPONGY_CASTLE).build(pkCache.getPrivateKey())
             );

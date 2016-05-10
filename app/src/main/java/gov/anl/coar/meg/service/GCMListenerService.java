@@ -10,12 +10,14 @@ import org.spongycastle.openpgp.PGPPublicKey;
 import org.spongycastle.util.encoders.Base64;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 import gov.anl.coar.meg.Util;
 import gov.anl.coar.meg.http.MEGServerRequest;
 import gov.anl.coar.meg.pgp.EncryptionLogic;
 import gov.anl.coar.meg.pgp.MEGPublicKeyRing;
+import gov.anl.coar.meg.pgp.SignatureLogic;
 
 /**
  * Created by greg on 3/6/16.
@@ -52,12 +54,13 @@ public class GCMListenerService extends GcmListenerService {
             InputStream pubkeyStream = request.getAssociatedPublicKey(messageId);
             JSONObject getResponse = request.getDecryptedMessage(messageId);
             EncryptionLogic logic = new EncryptionLogic();
+            SignatureLogic sigLogic = new SignatureLogic();
             InputStream message = new ByteArrayInputStream(Base64.decode(getResponse.getString("message")));
             InputStream clear = logic.decryptClientSymmetricData(this, message);
             PGPPublicKey pubKey = MEGPublicKeyRing.fromInputStream(pubkeyStream).getMasterPublicKey();
-            ByteArrayInputStream enc = new ByteArrayInputStream(
-                    Base64.encode(logic.pgpEncrypt(clear, pubKey).toByteArray())
-            );
+            ByteArrayInputStream signed = new ByteArrayInputStream(sigLogic.sign(getApplication(), clear));
+            byte[] encBytes = logic.pgpEncrypt(signed, pubKey).toByteArray();
+            ByteArrayInputStream enc = new ByteArrayInputStream(Base64.encode(encBytes));
             request.putEncryptedMessage(
                     getResponse.getString("email_to"), getResponse.getString("email_from"), enc
             );
@@ -73,7 +76,10 @@ public class GCMListenerService extends GcmListenerService {
             MEGServerRequest request = new MEGServerRequest();
             JSONObject getResponse = request.getDecryptedMessage(messageId);
             EncryptionLogic logic = new EncryptionLogic();
+            SignatureLogic sigLogic = new SignatureLogic();
             InputStream message = new ByteArrayInputStream(Base64.decode(getResponse.getString("message")));
+            //sigLogic.validateSignature(message);
+            //message.reset();
             ByteArrayInputStream decBuffer = logic.pgpDecrypt(message, getApplication());
             ByteArrayInputStream symInBuffer = logic.encryptAsClientBoundSymmetricData(this, decBuffer);
             ByteArrayInputStream b64sym = new ByteArrayInputStream(

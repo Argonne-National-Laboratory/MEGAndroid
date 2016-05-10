@@ -61,9 +61,6 @@ public class MEGRevocationKey {
         return new MEGRevocationKey(revocation);
     }
 
-    /**
-     * Add the revocation key to the public key ring. Overwrite the key ring file
-     */
     protected void toFile(
             Context context
     )
