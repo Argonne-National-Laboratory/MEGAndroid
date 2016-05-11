@@ -4,22 +4,39 @@ import android.app.Application;
 import android.renderscript.ScriptGroup;
 
 import org.spongycastle.bcpg.BCPGOutputStream;
+import org.spongycastle.bcpg.CompressionAlgorithmTags;
+import org.spongycastle.bcpg.HashAlgorithmTags;
+import org.spongycastle.bcpg.SymmetricKeyAlgorithmTags;
 import org.spongycastle.jce.provider.BouncyCastleProvider;
 import org.spongycastle.openpgp.PGPCompressedData;
+import org.spongycastle.openpgp.PGPCompressedDataGenerator;
+import org.spongycastle.openpgp.PGPEncryptedDataGenerator;
 import org.spongycastle.openpgp.PGPException;
+import org.spongycastle.openpgp.PGPLiteralData;
+import org.spongycastle.openpgp.PGPLiteralDataGenerator;
+import org.spongycastle.openpgp.PGPPrivateKey;
 import org.spongycastle.openpgp.PGPPublicKey;
 import org.spongycastle.openpgp.PGPSignature;
 import org.spongycastle.openpgp.PGPSignatureGenerator;
 import org.spongycastle.openpgp.PGPSignatureList;
+import org.spongycastle.openpgp.PGPSignatureSubpacketGenerator;
 import org.spongycastle.openpgp.PGPUtil;
 import org.spongycastle.openpgp.jcajce.JcaPGPObjectFactory;
 import org.spongycastle.openpgp.operator.jcajce.JcaPGPContentSignerBuilder;
 import org.spongycastle.openpgp.operator.jcajce.JcaPGPContentVerifierBuilderProvider;
+import org.spongycastle.openpgp.operator.jcajce.JcePBESecretKeyDecryptorBuilder;
+import org.spongycastle.openpgp.operator.jcajce.JcePGPDataEncryptorBuilder;
+import org.spongycastle.openpgp.operator.jcajce.JcePublicKeyKeyEncryptionMethodGenerator;
+import org.spongycastle.util.Arrays;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.security.SecureRandom;
 import java.security.Security;
+import java.util.Date;
+import java.util.Iterator;
 
 import gov.anl.coar.meg.Constants;
 
@@ -35,31 +52,40 @@ public class SignatureLogic {
 
     public byte[] sign(
             Application application,
-            InputStream input
+            OutputStream encrypted
     )
             throws PGPException, IOException
     {
+        ByteArrayOutputStream boas = new ByteArrayOutputStream();
         PrivateKeyCache pkCache = (PrivateKeyCache) application;
         if (pkCache.needsRefresh())
             throw new IllegalArgumentException("Private key is not cached. Cannot sign message");
 
-        PGPSignatureGenerator sGen = new PGPSignatureGenerator(new JcaPGPContentSignerBuilder(
-                pkCache.getSecretKey().getPublicKey().getAlgorithm(), PGPUtil.SHA1
-        ).setProvider(Constants.SPONGY_CASTLE));
-        sGen.init(PGPSignature.BINARY_DOCUMENT, pkCache.getPrivateKey());
-        ByteArrayOutputStream boas = new ByteArrayOutputStream();
-        BCPGOutputStream bOut = new BCPGOutputStream(boas);
-
-        int ch;
-        while ((ch = input.read()) >= 0) {
-            sGen.update((byte) ch);
+        final PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator(new JcaPGPContentSignerBuilder(
+                pkCache.getSecretKey().getPublicKey()
+                .getAlgorithm(), HashAlgorithmTags.SHA1).setProvider(new BouncyCastleProvider()));
+        signatureGenerator.init(PGPSignature.BINARY_DOCUMENT, pkCache.getPrivateKey());
+        final Iterator<?> it = pkCache.getSecretKey().getPublicKey().getUserIDs();
+        if (it.hasNext()) {
+            final PGPSignatureSubpacketGenerator spGen = new PGPSignatureSubpacketGenerator();
+            spGen.setSignerUserID(false, (String) it.next());
+            signatureGenerator.setHashedSubpackets(spGen.generate());
         }
-        sGen.generate().encode(bOut);
-        bOut.flush();
-        bOut.close();
-        input.close();
-        boas.close();
-        return boas.toByteArray();
+        signatureGenerator.generateOnePassVersion(false).encode(encrypted);
+
+        final PGPLiteralDataGenerator literalDataGenerator = new PGPLiteralDataGenerator();
+        final OutputStream literalOut = literalDataGenerator.open(
+                encrypted, PGPLiteralData.BINARY, "", new Date(), new byte[4096]
+        );
+        final byte[] buf = new byte[4096];
+        for (int len = 0; (len = inputStream.read(buf)) > 0;) {
+            literalOut.write(buf, 0, len);
+            signatureGenerator.update(buf, 0, len);
+        }
+        literalDataGenerator.close();
+        signatureGenerator.generate().encode(encrypted);
+        compressedDataGenerator.close();
+        encryptedDataGenerator.close();
     }
 
     public void validate(
