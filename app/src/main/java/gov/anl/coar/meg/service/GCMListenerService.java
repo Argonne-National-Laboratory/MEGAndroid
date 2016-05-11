@@ -12,6 +12,7 @@ import org.spongycastle.util.encoders.Base64;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import gov.anl.coar.meg.Util;
 import gov.anl.coar.meg.http.MEGServerRequest;
@@ -55,8 +56,8 @@ public class GCMListenerService extends GcmListenerService {
             InputStream message = new ByteArrayInputStream(Base64.decode(getResponse.getString("message")));
             InputStream clear = logic.decryptClientSymmetricData(this, message);
             PGPPublicKey pubKey = MEGPublicKeyRing.fromInputStream(pubkeyStream).getMasterPublicKey();
-            ByteArrayInputStream signed = new ByteArrayInputStream(sigLogic.sign(getApplication(), clear));
-            byte[] encBytes = logic.pgpEncrypt(signed, pubKey).toByteArray();
+            OutputStream enc = logic.pgpEncrypt(clear, pubKey);
+            ByteArrayInputStream signed = new ByteArrayInputStream(sigLogic.sign(getApplication(), enc));
             ByteArrayInputStream enc = new ByteArrayInputStream(Base64.encode(encBytes));
             request.putEncryptedMessage(
                     getResponse.getString("email_to"), getResponse.getString("email_from"), enc
