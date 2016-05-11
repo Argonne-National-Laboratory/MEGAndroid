@@ -6,87 +6,6 @@
   android:paddingBottom="@dimen/activity_vertical_margin"
   tools:context="gov.anl.coar.meg.Advanced_Options">
 
-  <TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textAppearance="?android:attr/textAppearanceMedium"
-    android:text="Private Key"
-    android:id="@+id/tvPrivKey"
-    android:layout_marginLeft="20dp" />
-  <EditText
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:inputType="textPassword"
-    android:id="@+id/etPrivKey"
-    android:layout_below="@+id/tvPrivKey"
-    android:layout_alignLeft="@+id/tvPrivKey"
-    android:layout_alignRight="@+id/etMEGServer"
-    android:layout_alignEnd="@+id/etMEGServer" />
-  <TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textAppearance="?android:attr/textAppearanceMedium"
-    android:text="MEG Server"
-    android:id="@+id/tvMEGServer"
-    android:layout_below="@+id/etPrivKey"
-    android:layout_alignLeft="@+id/tvPrivKey"/>
-  <EditText
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:inputType="textPassword"
-    android:id="@+id/etMEGServer"
-    android:layout_below="@+id/tvMEGServer"
-    android:layout_alignLeft="@+id/tvPrivKey"
-    android:layout_alignRight="@+id/etKeyRing"
-    android:layout_alignEnd="@+id/etKeyRing" />
-  <TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textAppearance="?android:attr/textAppearanceMedium"
-    android:text="Keyring Update Interval"
-    android:id="@+id/tvKeyRing"
-    android:layout_below="@+id/etMEGServer"
-    android:layout_alignLeft="@+id/tvPrivKey"/>
-  <EditText
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:inputType="textPassword"
-    android:id="@+id/etKeyRing"
-    android:layout_below="@+id/tvKeyRing"
-    android:layout_alignLeft="@+id/tvPrivKey"
-    android:layout_alignRight="@+id/bSave"
-    android:layout_alignEnd="@+id/bSave" />
-  <TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textAppearance="?android:attr/textAppearanceMedium"
-    android:text="Sync all mobile contacts"
-    android:id="@+id/tvSync"
-    android:layout_below="@+id/etKeyRing"
-    android:layout_alignLeft="@+id/tvPrivKey"
-    android:layout_marginBottom="15dp"
-    android:layout_marginTop="15dp" />
-
-  <TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textAppearance="?android:attr/textAppearanceMedium"
-    android:text="Update only on Wi-Fi"
-    android:id="@+id/tvUpdate"
-    android:layout_below="@+id/tvSync"
-    android:layout_alignLeft="@+id/tvPrivKey"
-    android:layout_marginBottom="15dp"/>
-
-  <TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textAppearance="?android:attr/textAppearanceMedium"
-    android:text="Out of band"
-    android:id="@+id/tvOutOfBand"
-    android:layout_below="@+id/tvUpdate"
-    android:layout_alignLeft="@+id/tvPrivKey"
-    android:layout_marginBottom="15dp"/>
-
 
   <Button
     android:layout_width="wrap_content"
@@ -126,31 +45,5 @@
     android:layout_marginEnd="20dp"
     android:layout_marginRight="20dp"
     android:layout_marginTop="5dp"/>
-
-  <CheckBox
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:id="@+id/cbSync"
-    android:checked="false"
-    android:layout_alignBottom="@+id/tvSync"
-    android:layout_marginTop="15dp"
-    android:layout_toRightOf="@+id/tvSync"
-    android:layout_marginLeft="20dp"/>
-
-  <CheckBox
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:id="@+id/cbUpdate"
-    android:checked="false"
-    android:layout_alignBottom="@+id/tvUpdate"
-    android:layout_alignRight="@+id/cbSync"/>
-
-  <CheckBox
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:id="@+id/cbOutOfBand"
-    android:checked="false"
-    android:layout_alignBottom="@+id/tvOutOfBand"
-    android:layout_alignRight="@+id/cbSync"/>
 
 </RelativeLayout>
