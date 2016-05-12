@@ -30,7 +30,13 @@ public class MEGPublicKeyRing {
     }
 
     /**
-     * Get public key ring from a file
+     * Get the public keyring from a file
+     *
+     * @param context
+     * @param filename
+     * @return
+     * @throws IOException
+     * @throws PGPException
      */
     protected static MEGPublicKeyRing fromFile(
             Context context,
@@ -43,6 +49,16 @@ public class MEGPublicKeyRing {
         return fromInputStream(keyIn);
     }
 
+    /**
+     * Main method to extract our public keyring. This method should be used
+     * whenever we just want things to work and not think about the underlying
+     * details about how to get a public key ring.
+     *
+     * @param context
+     * @return
+     * @throws IOException
+     * @throws PGPException
+     */
     public static MEGPublicKeyRing fromFile(
             Context context
     )

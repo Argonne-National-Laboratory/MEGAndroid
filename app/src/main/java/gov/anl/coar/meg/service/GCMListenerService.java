@@ -34,8 +34,10 @@ public class GCMListenerService extends GcmListenerService {
         Log.d(TAG, "message id: " + messageId + " message action: " + action);
         if (action.contains("decrypt")) {
             decryptMessage(messageId);
-        } else {
+        } else if (action.contains("encrypt")) {
             encryptMessage(messageId);
+        } else if (action.contains("revoke")) {
+            // TODO Remove sec key ring, remove pub keys, remove symmetric keys.
         }
     }
 
