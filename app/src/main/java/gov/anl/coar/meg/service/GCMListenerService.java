@@ -37,7 +37,7 @@ public class GCMListenerService extends GcmListenerService {
         } else if (action.contains("encrypt")) {
             encryptMessage(messageId);
         } else if (action.contains("revoke")) {
-            // TODO Remove sec key ring, remove pub keys, remove symmetric keys.
+            Util.deleteAllFiles(this);
         }
     }
 

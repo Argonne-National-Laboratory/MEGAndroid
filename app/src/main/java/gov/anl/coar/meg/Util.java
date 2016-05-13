@@ -23,6 +23,27 @@ import java.util.Scanner;
  * Created by greg on 2/29/16.
  */
 public class Util {
+
+    /**
+     * Delete all MEG related files on the phone. As a note: we should only be doing
+     * this if we are revoking our keys.
+     *
+     * @param context
+     */
+    public static void deleteAllFiles(
+            Context context
+    ) {
+        try {
+            new File(context.getFilesDir(), Constants.PHONENUMBER_FILENAME).delete();
+            new File(context.getFilesDir(), Constants.EMAIL_FILENAME).delete();
+            new File(context.getFilesDir(), Constants.PUBLICKEYRING_FILENAME).delete();
+            new File(context.getFilesDir(), Constants.SECRETKEYRING_FILENAME).delete();
+            new File(context.getFilesDir(), Constants.REVOCATIONKEY_FILENAME).delete();
+            new File(context.getFilesDir(), Constants.SECRETKEYRING_FILENAME).delete();
+            new File(context.getFilesDir(), Constants.SYMMETRICKEY_META_FILENAME).delete();
+        } catch (Exception e) {}
+    }
+
     /**
      * Return true if secret key exists otherwise false
      *
