@@ -34,7 +34,7 @@ public class GCMInstanceIdRegistrationService extends IntentService{
             Intent intent
     ) {
         Bundle bundle = new Bundle();
-        ResultReceiver result = intent.getParcelableExtra("receiver");
+        ResultReceiver result = intent.getParcelableExtra(Constants.RECEIVER_KEY);
         try {
             String phoneNumber = Util.getPhoneNumber(this);
             // This is essentially a hasRegistered check.

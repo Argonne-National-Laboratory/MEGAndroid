@@ -28,13 +28,14 @@ public class GCMListenerService extends GcmListenerService {
             String from,
             Bundle data
     ) {
-        String messageId = data.getString("message_id");
         String action = data.getString("action");
         Log.d(TAG, "message received from: " + from);
-        Log.d(TAG, "message id: " + messageId + " message action: " + action);
+        Log.d(TAG, "message action: " + action);
         if (action.contains("decrypt")) {
+            String messageId = data.getString("message_id");
             decryptMessage(messageId);
         } else if (action.contains("encrypt")) {
+            String messageId = data.getString("message_id");
             encryptMessage(messageId);
         } else if (action.contains("revoke")) {
             Util.deleteAllFiles(this);

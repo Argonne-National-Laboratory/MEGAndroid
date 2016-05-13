@@ -9,6 +9,7 @@ import com.github.kevinsawicki.http.HttpRequest;
 import org.json.JSONObject;
 
 import java.io.InputStream;
+import java.security.InvalidParameterException;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -212,8 +213,10 @@ public class MEGServerRequest {
     )
             throws Exception
     {
+        // Its 16 chars. So just take the final 8. I guess we can have a case for the
+        // final 8 chars. But for now its not a big deal.
         if (keyId.length() > 8) {
-            keyId = keyId.substring(0, 8);
+            keyId = keyId.substring(keyId.length() - 8, keyId.length());
         }
         String url = mServerUrl + REVOKE_KEY_URL;
         Log.d(TAG, "Request revoke key for key id: " + keyId);
@@ -221,7 +224,9 @@ public class MEGServerRequest {
             HttpRequest response = HttpRequest.post(url, true, "keyid", keyId);
             if (response.ok())
                 return;
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if (mCurRetries < mMaxRetries) {
             mCurRetries += 1;
             TimeUnit.SECONDS.sleep(mRetryTimeout);

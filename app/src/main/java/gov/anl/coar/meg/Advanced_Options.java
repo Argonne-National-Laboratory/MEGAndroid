@@ -3,25 +3,29 @@ package gov.anl.coar.meg;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
-import org.spongycastle.openpgp.PGPPublicKey;
-
-import gov.anl.coar.meg.http.MEGServerRequest;
-import gov.anl.coar.meg.pgp.MEGPublicKeyRing;
+import gov.anl.coar.meg.receiver.MEGResultReceiver;
+import gov.anl.coar.meg.receiver.MEGResultReceiver.Receiver;
+import gov.anl.coar.meg.receiver.ReceiverCode;
+import gov.anl.coar.meg.service.KeyRevocationService;
 
 /** Class to provide functionality to the Advanced Options page of MEG
  *
  * @author Bridget Basan
  */
-public class Advanced_Options extends AppCompatActivity implements View.OnClickListener {
+public class Advanced_Options extends AppCompatActivity
+        implements View.OnClickListener, Receiver {
     Button bRevoke;
     Button bSave;
+
+    Intent mKeyRevocationService;
+    MEGResultReceiver mReceiver;
 
 	/** Default method */
     @Override
@@ -44,29 +48,16 @@ public class Advanced_Options extends AppCompatActivity implements View.OnClickL
         return builder.create();
     }
 
-    private void revokeKey() {
-        long keyId = 0;
-        try {
-            PGPPublicKey pub = MEGPublicKeyRing.fromFile(this).getMasterPublicKey();
-            keyId = pub.getKeyID();
-        } catch (Exception e) {
-            alertBuilder(R.string.no_key_to_revoke_msg).show();
-            return;
-        }
-        MEGServerRequest request = new MEGServerRequest();
-        try {
-            request.revokeKey(Long.toHexString(keyId).toUpperCase());
-        } catch (Exception e) {
-            alertBuilder(R.string.something_wrong_server_msg).show();
-            return;
-        }
-    }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.bRevoke: {
-                revokeKey();
+                mReceiver = new MEGResultReceiver(new Handler());
+                mReceiver.setReceiver(this);
+                mKeyRevocationService = new Intent(this, KeyRevocationService.class);
+                mKeyRevocationService.putExtra(Constants.RECEIVER_KEY, mReceiver);
+                startService(mKeyRevocationService);
                 break;
             }
             case R.id.bSave: {
@@ -74,5 +65,15 @@ public class Advanced_Options extends AppCompatActivity implements View.OnClickL
                 break;
             }
         }
+    }
+
+    @Override
+    public void onReceiveResult(int resultCode, Bundle resultData) {
+        if (resultCode != ReceiverCode.IID_CODE_SUCCESS) {
+            alertBuilder(resultData.getInt(Constants.ALERT_MESSAGE_KEY)).show();
+        }
+        // The user can try again. We don't want to continually serve them
+        // up error warnings
+        stopService(mKeyRevocationService);
     }
 }

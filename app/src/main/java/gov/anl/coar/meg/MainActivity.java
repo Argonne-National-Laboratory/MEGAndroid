@@ -66,7 +66,7 @@ public class MainActivity extends FragmentActivity
             mReceiver = new MEGResultReceiver(new Handler());
             mReceiver.setReceiver(this);
             mInstanceIdIntent = new Intent(this, GCMInstanceIdRegistrationService.class);
-            mInstanceIdIntent.putExtra("receiver", mReceiver);
+            mInstanceIdIntent.putExtra(Constants.RECEIVER_KEY, mReceiver);
             startService(mInstanceIdIntent);
         } else {
             // TODO Some kind of warning to do something to set up google play services
