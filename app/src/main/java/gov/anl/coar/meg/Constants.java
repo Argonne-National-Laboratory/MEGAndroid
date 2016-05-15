@@ -41,4 +41,7 @@ public class Constants {
 
     public static final String SHA_256 = "SHA-256";
     public static final String MD5 = "MD5";
+
+    public static final String ALERT_MESSAGE_KEY = "alertMessage";
+    public static final String RECEIVER_KEY = "receiver";
 }

@@ -34,6 +34,7 @@ public class Installation extends AppCompatActivity
     implements View.OnClickListener, Receiver {
 
     Button bNext;
+    Button bAdvanced;
     EditText etFirstName;
     EditText etLastName;
     EditText etEmail;
@@ -56,6 +57,8 @@ public class Installation extends AppCompatActivity
 
         bNext = (Button) findViewById(R.id.bNext);
         bNext.setOnClickListener(this);
+        bAdvanced = (Button) findViewById(R.id.bAdvanced);
+        bAdvanced.setOnClickListener(this);
 
         etFirstName = (EditText) findViewById(R.id.etFname);
         etLastName = (EditText) findViewById(R.id.etLname);
@@ -158,6 +161,9 @@ public class Installation extends AppCompatActivity
                     e.printStackTrace();
                 }
                 return;
+            }
+            case R.id.bAdvanced: {
+                startActivity(new Intent(this, Advanced_Options.class));
             }
         }
     }

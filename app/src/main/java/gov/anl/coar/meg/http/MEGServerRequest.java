@@ -9,6 +9,7 @@ import com.github.kevinsawicki.http.HttpRequest;
 import org.json.JSONObject;
 
 import java.io.InputStream;
+import java.security.InvalidParameterException;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -22,12 +23,13 @@ public class MEGServerRequest {
     private final String TAG = "MEGServerRequest";
     private final String mServerUrl = Constants.MEG_API_URL;
 
-    public static final String ADD_PUBLIC_KEY_URL = "/addkey/";
+    private static final String ADD_PUBLIC_KEY_URL = "/addkey/";
     private static final String ENCRYPTED_MSG_URL = "/encrypted_message/";
     private static final String DECRYPTED_MSG_URL = "/decrypted_message/";
     private static final String GET_KEY_BY_MSG_ID_URL = "/getkey_by_message_id/";
+    private static final String REVOKE_KEY_URL = "/request_revoke/";
     private static final String STORE_INSTANCE_ID_API_ROUTE = "/gcm_instance_id/";
-    public static final String STORE_REVOCATION_URL = "/store_revocation_cert";
+    private static final String STORE_REVOCATION_URL = "/store_revocation_cert";
 
     private int mCurRetries = 0;
     private int mMaxRetries = Constants.HTTP_MAX_RETRIES;
@@ -204,5 +206,32 @@ public class MEGServerRequest {
             return getAssociatedPublicKey(messageId);
         }
         throw new Exception("Unable to get associated public key for message id: " + messageId);
+    }
+
+    public void revokeKey(
+            String keyId
+    )
+            throws Exception
+    {
+        // Its 16 chars. So just take the final 8. I guess we can have a case for the
+        // final 8 chars. But for now its not a big deal.
+        if (keyId.length() > 8) {
+            keyId = keyId.substring(keyId.length() - 8, keyId.length());
+        }
+        String url = mServerUrl + REVOKE_KEY_URL;
+        Log.d(TAG, "Request revoke key for key id: " + keyId);
+        try {
+            HttpRequest response = HttpRequest.post(url, true, "keyid", keyId);
+            if (response.ok())
+                return;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (mCurRetries < mMaxRetries) {
+            mCurRetries += 1;
+            TimeUnit.SECONDS.sleep(mRetryTimeout);
+            revokeKey(keyId);
+        }
+        throw new Exception("Was unable to make request to revoke key");
     }
 }

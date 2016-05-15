@@ -36,6 +36,10 @@
             android:label="@string/title_activity_installation" >
         </activity>
         <activity
+            android:name=".Advanced_Options"
+            android:label="Advanced Options" >
+        </activity>
+        <activity
             android:name=".Login"
             android:label="Login"
             android:screenOrientation="portrait">
@@ -52,6 +56,10 @@
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
         </receiver>
+        <service
+            android:name=".service.KeyRevocationService"
+            android:exported="false"
+            />
         <service
             android:name=".service.GCMInstanceIdRegistrationService"
             android:exported="false"
