@@ -1,6 +1,10 @@
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.android.application'
 
+configurations.all {
+    resolutionStrategy.force 'com.android.support:support-annotations:23.1.1'
+}
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit-dep:4.8'
@@ -8,7 +12,7 @@ dependencies {
     androidTestCompile 'com.android.support:support-annotations:23.1.1'
     androidTestCompile 'com.android.support.test:runner:0.4.1'
     androidTestCompile 'com.android.support.test:rules:0.4.1'
-    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.android.support:appcompat-v7:24.0.0-alpha2'
     compile 'com.github.kevinsawicki:http-request:6.0'
     compile 'com.google.android.gms:play-services-gcm:8.4.0'
     compile 'com.madgag.spongycastle:core:1.54.0.0'
@@ -18,12 +22,6 @@ dependencies {
 
 android {
     signingConfigs {
-        debug {
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
-            storeFile file('/Users/greg/.android/debug.keystore')
-            storePassword 'android'
-        }
         release {
             keyAlias 'release-main'
             storeFile file('/Users/greg/.android/release.keystore')
