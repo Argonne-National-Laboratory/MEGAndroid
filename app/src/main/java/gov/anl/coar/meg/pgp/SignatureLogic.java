@@ -1,23 +1,27 @@
 package gov.anl.coar.meg.pgp;
 
+import android.util.Log;
+
 import org.spongycastle.bcpg.BCPGOutputStream;
 import org.spongycastle.jce.provider.BouncyCastleProvider;
 import org.spongycastle.openpgp.PGPCompressedData;
 import org.spongycastle.openpgp.PGPException;
+import org.spongycastle.openpgp.PGPObjectFactory;
 import org.spongycastle.openpgp.PGPPublicKey;
 import org.spongycastle.openpgp.PGPSignature;
 import org.spongycastle.openpgp.PGPSignatureGenerator;
 import org.spongycastle.openpgp.PGPSignatureList;
 import org.spongycastle.openpgp.PGPUtil;
-import org.spongycastle.openpgp.jcajce.JcaPGPObjectFactory;
+import org.spongycastle.openpgp.bc.BcPGPObjectFactory;
 import org.spongycastle.openpgp.operator.jcajce.JcaPGPContentSignerBuilder;
 import org.spongycastle.openpgp.operator.jcajce.JcaPGPContentVerifierBuilderProvider;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.Security;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import gov.anl.coar.meg.Constants;
 
@@ -26,6 +30,7 @@ import gov.anl.coar.meg.Constants;
  */
 public class SignatureLogic {
     private static final String TAG = "SignatureLogic";
+    public static final byte[] DELINEATOR = "&&^&&***&&^&&".getBytes();
 
     public SignatureLogic() {
         Security.addProvider(new BouncyCastleProvider());
@@ -39,8 +44,6 @@ public class SignatureLogic {
     {
         ByteArrayInputStream bais = new ByteArrayInputStream(msg);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        out.write(msg);
-
         PGPSignatureGenerator sGen = new PGPSignatureGenerator(
                 new JcaPGPContentSignerBuilder(
                         pkCache.getSecretKey().getPublicKey().getAlgorithm(), PGPUtil.SHA1
@@ -54,66 +57,85 @@ public class SignatureLogic {
         }
         bais.close();
         sGen.generate().encode(bOut);
+        out.write(DELINEATOR);
+        out.write(msg);
         out.close();
         return out.toByteArray();
     }
 
-    public void validate(
-            PGPPublicKey signedWith,
-            InputStream input
-    )
-            throws IOException, PGPException, BadSignatureException
-    {
-        boolean isValid = validateSignature(signedWith, input);
-        // TODO should send message back to client warning them
-        if (!isValid) {
-            throw new BadSignatureException();
-        }
-    }
-
     public String getKeyId(
-        InputStream input
+            byte[] signature
     )
             throws IOException, PGPException
     {
-        PGPSignature sig = getSignature(input);
+        PGPSignature sig = getSignature(signature);
         return Long.toHexString(sig.getKeyID()).toUpperCase();
     }
 
-    private boolean validateSignature(
-        PGPPublicKey signedWith,
-        InputStream input
+    private int indexOfDelineator(byte[] array) {
+        for(int i = 0; i < array.length - DELINEATOR.length+1; ++i) {
+            boolean found = true;
+            for(int j = 0; j < DELINEATOR.length; ++j) {
+                if (array[i+j] != DELINEATOR[j]) {
+                    found = false;
+                    break;
+                }
+            }
+            if (found) return i;
+        }
+        return -1;
+    }
+
+    public ArrayList<byte[]> splitSignatureAndMessage(
+            byte[] bytesIn
     )
-            throws IOException, PGPException
+            throws IllegalArgumentException
     {
-        PGPSignature sig = getSignature(input);
+        ArrayList<byte[]> output = new ArrayList<>(2);
+        int idx = indexOfDelineator(bytesIn);
+        if (idx == -1)
+            throw new IllegalArgumentException("Could not find delineator in message");
+        // Get the byte array for the signature
+        output.add(Arrays.copyOfRange(bytesIn, 0, idx));
+        // Get the byte array for the message
+        output.add(Arrays.copyOfRange(bytesIn, idx + DELINEATOR.length, bytesIn.length));
+        return output;
+    }
+
+    public void validateSignature(
+        PGPPublicKey signedWith,
+        byte[] signature,
+        byte[] msg
+    )
+            throws IOException, PGPException, BadSignatureException
+    {
+        PGPSignature sig = getSignature(signature);
         sig.init(new JcaPGPContentVerifierBuilderProvider().setProvider(Constants.SPONGY_CASTLE), signedWith);
 
+        ByteArrayInputStream bais = new ByteArrayInputStream(msg);
         int ch;
-        input.reset();
-        while ((ch = input.read()) >= 0) {
+        while ((ch = bais.read()) >= 0) {
             sig.update((byte)ch);
         }
-
-        input.close();
-        return sig.verify();
+        bais.close();
+        if (!sig.verify()) {
+            throw new BadSignatureException("The signature found is invalid.");
+        }
     }
 
     private PGPSignature getSignature(
-            InputStream input
+            byte[] bytesIn
     )
             throws IOException, PGPException
     {
-        InputStream decoderInput = PGPUtil.getDecoderStream(input);
-
-        JcaPGPObjectFactory pgpFact = new JcaPGPObjectFactory(decoderInput);
+        PGPObjectFactory objectFactory = new BcPGPObjectFactory(bytesIn);
         PGPSignatureList pgpSigList;
 
-        Object obj = pgpFact.nextObject();
+        Object obj = objectFactory.nextObject();
         if (obj instanceof PGPCompressedData) {
             PGPCompressedData c1 = (PGPCompressedData) obj;
-            pgpFact = new JcaPGPObjectFactory(c1.getDataStream());
-            pgpSigList = (PGPSignatureList) pgpFact.nextObject();
+            objectFactory = new BcPGPObjectFactory(c1.getDataStream());
+            pgpSigList = (PGPSignatureList) objectFactory.nextObject();
         } else {
             pgpSigList = (PGPSignatureList) obj;
         }

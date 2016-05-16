@@ -2,6 +2,7 @@ package gov.anl.coar.meg.pgp;
 
 import android.app.Application;
 import android.content.Context;
+import android.util.Log;
 
 import org.json.JSONObject;
 import org.spongycastle.crypto.InvalidCipherTextException;
@@ -13,6 +14,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import gov.anl.coar.meg.http.MEGServerRequest;
 
@@ -20,6 +23,7 @@ import gov.anl.coar.meg.http.MEGServerRequest;
  * Created by greg on 5/14/16.
  */
 public class MEGMessage {
+    private static final String TAG = "MEGMessage";
 
     // Keep track of the original message we received
     private static String mOriginalMsg;
@@ -140,6 +144,20 @@ public class MEGMessage {
         mCurMsg = mSigLogic.sign(mPKCache, mCurMsg);
     }
 
+    private void validateSignature()
+            throws Exception
+    {
+        Log.d(TAG, "validate message signature");
+        ArrayList<byte[]> array = mSigLogic.splitSignatureAndMessage(mCurMsg);
+        byte[] signature = array.get(0);
+        mCurMsg = array.get(1);
+        String keyId = mSigLogic.getKeyId(signature);
+        ByteArrayInputStream bais = new ByteArrayInputStream(mServerRequest.getPublicKey(keyId).getString("key").getBytes());
+        mPartnerPubKey = MEGPublicKeyRing.fromInputStream(bais).getMasterPublicKey();
+        bais.close();
+        mSigLogic.validateSignature(mPartnerPubKey, signature, mCurMsg);
+    }
+
     private void submitEncryptedToServer()
             throws Exception
     {
@@ -157,16 +175,16 @@ public class MEGMessage {
     public void performEncryptionFlow()
         throws Exception
     {
-        performEncryptionFlow();
         decryptWithClientSymKey();
-        signMessage();
         encryptMessage();
+        signMessage();
         submitEncryptedToServer();
     }
 
     public void performDecryptionFlow()
         throws Exception
     {
+        validateSignature();
         decryptMessage();
         encryptWithClientSymKey();
         submitDecryptedToServer();
