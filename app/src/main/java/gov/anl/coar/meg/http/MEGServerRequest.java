@@ -9,7 +9,6 @@ import com.github.kevinsawicki.http.HttpRequest;
 import org.json.JSONObject;
 
 import java.io.InputStream;
-import java.security.InvalidParameterException;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -26,6 +25,7 @@ public class MEGServerRequest {
     private static final String ADD_PUBLIC_KEY_URL = "/addkey/";
     private static final String ENCRYPTED_MSG_URL = "/encrypted_message/";
     private static final String DECRYPTED_MSG_URL = "/decrypted_message/";
+    private static final String GET_KEY_URL = "/getkey/";
     private static final String GET_KEY_BY_MSG_ID_URL = "/getkey_by_message_id/";
     private static final String REVOKE_KEY_URL = "/request_revoke/";
     private static final String STORE_INSTANCE_ID_API_ROUTE = "/gcm_instance_id/";
@@ -188,6 +188,27 @@ public class MEGServerRequest {
         throw new MEGServerException("Unable to send revocation key to server");
     }
 
+    public JSONObject getPublicKey(
+            String keyId
+    )
+            throws Exception
+    {
+        keyId = cutKeyId(keyId);
+        String url = mServerUrl + GET_KEY_URL + keyId;
+        Log.d(TAG, "Get public key by id: " + keyId);
+        try {
+            HttpRequest response = HttpRequest.get(url);
+            if (response.ok())
+                return new JSONObject(response.body());
+        } catch(Exception e) {}  // Likely ConnectionError
+        if (mCurRetries < mMaxRetries) {
+            mCurRetries += 1;
+            TimeUnit.SECONDS.sleep(mRetryTimeout);
+            return getPublicKey(keyId);
+        }
+        throw new Exception("Unable to get public key by id: " + keyId);
+    }
+
     public InputStream getAssociatedPublicKey(
             String messageId
     )
@@ -213,11 +234,7 @@ public class MEGServerRequest {
     )
             throws Exception
     {
-        // Its 16 chars. So just take the final 8. I guess we can have a case for the
-        // final 8 chars. But for now its not a big deal.
-        if (keyId.length() > 8) {
-            keyId = keyId.substring(keyId.length() - 8, keyId.length());
-        }
+        keyId = cutKeyId(keyId);
         String url = mServerUrl + REVOKE_KEY_URL;
         Log.d(TAG, "Request revoke key for key id: " + keyId);
         try {
@@ -233,5 +250,14 @@ public class MEGServerRequest {
             revokeKey(keyId);
         }
         throw new Exception("Was unable to make request to revoke key");
+    }
+
+    private String cutKeyId(
+            String keyId
+    ) {
+        if (keyId.length() > 8) {
+            keyId = keyId.substring(keyId.length() - 8, keyId.length());
+        }
+        return keyId;
     }
 }

@@ -81,7 +81,7 @@ public class EncryptionLogic {
         byte[] encMsgData = Arrays.copyOfRange(bytesIn, 0, bytesIn.length - BYTES_IN_ENCRYPTED_AES);
         // Decrypt the key portion to get key data we need.
         BufferedInputStream decKeyData = decryptWithPK(new ByteArrayInputStream(encKeyData), privateKey);
-        byte[] keyDecBytes  = Util.inputStreamToOutputStream(decKeyData).toByteArray();
+        byte[] keyDecBytes = Util.inputStreamToOutputStream(decKeyData).toByteArray();
         decKeyData.close();
         byte[] keyBytes = Arrays.copyOfRange(keyDecBytes, 0, Constants.AES_KEY_BYTES);
         byte[] ivBytes = Arrays.copyOfRange(keyDecBytes, Constants.AES_KEY_BYTES, keyDecBytes.length);
