@@ -33,15 +33,13 @@ public class Util {
     public static void deleteAllFiles(
             Context context
     ) {
-        try {
-            new File(context.getFilesDir(), Constants.PHONENUMBER_FILENAME).delete();
-            new File(context.getFilesDir(), Constants.EMAIL_FILENAME).delete();
-            new File(context.getFilesDir(), Constants.PUBLICKEYRING_FILENAME).delete();
-            new File(context.getFilesDir(), Constants.SECRETKEYRING_FILENAME).delete();
-            new File(context.getFilesDir(), Constants.REVOCATIONKEY_FILENAME).delete();
-            new File(context.getFilesDir(), Constants.SECRETKEYRING_FILENAME).delete();
-            new File(context.getFilesDir(), Constants.SYMMETRICKEY_META_FILENAME).delete();
-        } catch (Exception e) {}
+        new File(context.getFilesDir(), Constants.PHONENUMBER_FILENAME).delete();
+        new File(context.getFilesDir(), Constants.EMAIL_FILENAME).delete();
+        new File(context.getFilesDir(), Constants.PUBLICKEYRING_FILENAME).delete();
+        new File(context.getFilesDir(), Constants.SECRETKEYRING_FILENAME).delete();
+        new File(context.getFilesDir(), Constants.REVOCATIONKEY_FILENAME).delete();
+        new File(context.getFilesDir(), Constants.SECRETKEYRING_FILENAME).delete();
+        new File(context.getFilesDir(), Constants.SYMMETRICKEY_META_FILENAME).delete();
     }
 
     /**

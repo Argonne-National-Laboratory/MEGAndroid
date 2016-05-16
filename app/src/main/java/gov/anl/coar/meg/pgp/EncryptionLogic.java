@@ -1,6 +1,5 @@
 package gov.anl.coar.meg.pgp;
 
-import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
@@ -16,6 +15,7 @@ import org.spongycastle.openpgp.PGPException;
 import org.spongycastle.openpgp.PGPLiteralData;
 import org.spongycastle.openpgp.PGPLiteralDataGenerator;
 import org.spongycastle.openpgp.PGPOnePassSignatureList;
+import org.spongycastle.openpgp.PGPPrivateKey;
 import org.spongycastle.openpgp.PGPPublicKey;
 import org.spongycastle.openpgp.PGPPublicKeyEncryptedData;
 import org.spongycastle.openpgp.PGPUtil;
@@ -65,29 +65,28 @@ public class EncryptionLogic {
      * extract the portion with encrypted key data and AES encrypted message data. We
      * then decrypt the key data so we can decrypt the message data.
      *
-     * @param input
-     * @param application
+     * @param bytesIn
+     * @param privateKey
      * @return
      */
-    public ByteArrayInputStream pgpDecrypt(
-            InputStream input,
-            Application application
+    public byte[] pgpDecrypt(
+            byte[] bytesIn,
+            PGPPrivateKey privateKey
     )
             throws IOException, InvalidCipherTextException
     {
         KeyGenerationLogic keygen = new KeyGenerationLogic();
-        byte[] bytes  = Util.inputStreamToOutputStream(input).toByteArray();
         // Cut up the message. Get the message portion and the key portion
-        byte[] encKeyData = Arrays.copyOfRange(bytes, bytes.length - BYTES_IN_ENCRYPTED_AES, bytes.length);
-        byte[] encMsgData = Arrays.copyOfRange(bytes, 0, bytes.length - BYTES_IN_ENCRYPTED_AES);
+        byte[] encKeyData = Arrays.copyOfRange(bytesIn, bytesIn.length - BYTES_IN_ENCRYPTED_AES, bytesIn.length);
+        byte[] encMsgData = Arrays.copyOfRange(bytesIn, 0, bytesIn.length - BYTES_IN_ENCRYPTED_AES);
         // Decrypt the key portion to get key data we need.
-        BufferedInputStream decKeyData = decryptWithPK(new ByteArrayInputStream(encKeyData), application);
+        BufferedInputStream decKeyData = decryptWithPK(new ByteArrayInputStream(encKeyData), privateKey);
         byte[] keyDecBytes  = Util.inputStreamToOutputStream(decKeyData).toByteArray();
         decKeyData.close();
         byte[] keyBytes = Arrays.copyOfRange(keyDecBytes, 0, Constants.AES_KEY_BYTES);
         byte[] ivBytes = Arrays.copyOfRange(keyDecBytes, Constants.AES_KEY_BYTES, keyDecBytes.length);
         BufferedBlockCipher cipher = keygen.generateSymmetricKey(keyBytes, ivBytes, false);
-        return performSymmetricKeyAction(cipher, new ByteArrayInputStream(encMsgData));
+        return performSymmetricKeyAction(cipher, encMsgData);
     }
 
     /**
@@ -96,7 +95,7 @@ public class EncryptionLogic {
      * end of the message with the RSA key so that the receiver will understand
      * how to decrypt the message.
      *
-     * @param input
+     * @param bytesIn
      * @param encKey
      * @return
      * @throws NoSuchAlgorithmException
@@ -105,8 +104,8 @@ public class EncryptionLogic {
      * @throws PGPException
      */
     public ByteArrayOutputStream pgpEncrypt(
-           InputStream input,
-           PGPPublicKey encKey
+            byte[] bytesIn,
+            PGPPublicKey encKey
     )
             throws NoSuchAlgorithmException, IOException, InvalidCipherTextException, PGPException
     {
@@ -115,13 +114,11 @@ public class EncryptionLogic {
         ByteArrayOutputStream keyDataConcat = new ByteArrayOutputStream();
         keyDataConcat.write(keyData.get(0));
         keyDataConcat.write(keyData.get(1));
-        ByteArrayOutputStream encKeyData = encryptWithPubKey(new ByteArrayInputStream(keyDataConcat.toByteArray()), encKey);
+        ByteArrayOutputStream encKeyData = encryptWithPubKey(keyDataConcat.toByteArray(), encKey);
         keyDataConcat.close();
         BufferedBlockCipher cipher = keygen.generateSymmetricKey(keyData.get(0), keyData.get(1), true);
-        ByteArrayInputStream encInput = performSymmetricKeyAction(cipher, input);
-        input.close();
-        ByteArrayOutputStream output = Util.inputStreamToOutputStream(encInput);
-        encInput.close();
+        byte[] encMsg = performSymmetricKeyAction(cipher, bytesIn);
+        ByteArrayOutputStream output = Util.inputStreamToOutputStream(new ByteArrayInputStream(encMsg));
         output.write(encKeyData.toByteArray());
         encKeyData.close();
         return output;
@@ -131,13 +128,13 @@ public class EncryptionLogic {
      * Decrypt data using our private key.
      *
      * @param inBuffer
-     * @param application
+     * @param privateKey
      * @return
      * @throws IllegalArgumentException
      */
     private BufferedInputStream decryptWithPK(
             InputStream inBuffer,
-            Application application
+            PGPPrivateKey privateKey
     )
         throws IllegalArgumentException
     {
@@ -151,15 +148,10 @@ public class EncryptionLogic {
                 encrypted = (PGPEncryptedDataList) object;
             else
                 encrypted = (PGPEncryptedDataList) pgpFactory.nextObject();
-            PrivateKeyCache pkCache = (PrivateKeyCache) application;
-            // Are there additional things we can do like put an error on the screen?
-            if (pkCache.needsRefresh())
-                throw new IllegalArgumentException("Private key is not cached. Cannot decrypt message");
-            // TODO Should only be encrypted with one public key right??
             PGPPublicKeyEncryptedData pbe = (PGPPublicKeyEncryptedData) encrypted.getEncryptedDataObjects().next();
-            Log.d(TAG, "Message intended for id: " + Long.toHexString(pbe.getKeyID()).toUpperCase() + " using key id: " + Long.toHexString(pkCache.getPrivateKey().getKeyID()).toUpperCase() + " to decrypt");
+            Log.d(TAG, "Message intended for id: " + Long.toHexString(pbe.getKeyID()).toUpperCase() + " using key id: " + Long.toHexString(privateKey.getKeyID()).toUpperCase() + " to decrypt");
             InputStream clearText = pbe.getDataStream(
-                    new JcePublicKeyDataDecryptorFactoryBuilder().setProvider(Constants.SPONGY_CASTLE).build(pkCache.getPrivateKey())
+                    new JcePublicKeyDataDecryptorFactoryBuilder().setProvider(Constants.SPONGY_CASTLE).build(privateKey)
             );
             JcaPGPObjectFactory plainFact = new JcaPGPObjectFactory(clearText);
             Object message = plainFact.nextObject();
@@ -186,20 +178,18 @@ public class EncryptionLogic {
     /**
      * Encrypt data with our public key
      *
-     * @param input
+     * @param clearData
      * @param encKey
      * @return
      * @throws IOException
      * @throws PGPException
      */
     private ByteArrayOutputStream encryptWithPubKey(
-            InputStream input,
+            byte[] clearData,
             PGPPublicKey encKey
     )
             throws IOException, PGPException
     {
-        Log.d(TAG, "perform encrypt action on message");
-        byte[] clearData = Util.inputStreamToOutputStream(input).toByteArray();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ByteArrayOutputStream bOut = new ByteArrayOutputStream();
         PGPCompressedDataGenerator comData = new PGPCompressedDataGenerator(
@@ -227,64 +217,61 @@ public class EncryptionLogic {
      * Decrypt data that was symmetrically encrypted by the mail client
      *
      * @param context
-     * @param buffer
+     * @param bytesIn
      * @return
      * @throws IOException
      * @throws InvalidCipherTextException
      */
-    public ByteArrayInputStream decryptClientSymmetricData(
+    public byte[] decryptClientSymmetricData(
             Context context,
-            InputStream buffer
+            byte[] bytesIn
     )
             throws IOException, InvalidCipherTextException
     {
         KeyGenerationLogic keygen = new KeyGenerationLogic();
         BufferedBlockCipher cipher = keygen.generateSymmetricKeyFromQRData(context, false);
-        return performSymmetricKeyAction(cipher, buffer);
+        return performSymmetricKeyAction(cipher, bytesIn);
     }
 
     /**
      * Symmetrically encrypt data that is bound for the client
      *
      * @param context
-     * @param buffer
+     * @param bytesIn
      * @return
      * @throws IOException
      * @throws InvalidCipherTextException
      */
-    public ByteArrayInputStream encryptAsClientBoundSymmetricData(
+    public byte[] encryptAsClientBoundSymmetricData(
             Context context,
-            InputStream buffer
+            byte[] bytesIn
     )
             throws IOException, InvalidCipherTextException
     {
         KeyGenerationLogic keygen = new KeyGenerationLogic();
         BufferedBlockCipher cipher = keygen.generateSymmetricKeyFromQRData(context, true);
-        return performSymmetricKeyAction(cipher, buffer);
+        return performSymmetricKeyAction(cipher, bytesIn);
     }
 
     /**
      * Either decrypt or encrypt some inputted buffer using a supplied cipher.
      *
      * @param cipher
-     * @param buffer
+     * @param bytesIn
      * @return
      * @throws IOException
      * @throws InvalidCipherTextException
      */
-    private ByteArrayInputStream performSymmetricKeyAction(
+    private byte[] performSymmetricKeyAction(
             BufferedBlockCipher cipher,
-            InputStream buffer
+            byte[] bytesIn
     )
             throws IOException, InvalidCipherTextException
     {
-        byte [] bytesIn = Util.inputStreamToOutputStream(buffer).toByteArray();
-        buffer.close();
         int buflen = cipher.getOutputSize(bytesIn.length);
         byte[] bytesOut = new byte[buflen];
         int nBytesEnc = cipher.processBytes(bytesIn, 0, bytesIn.length, bytesOut, 0);
         cipher.doFinal(bytesOut, nBytesEnc);
-        // It might make sense to just return raw bytes
-        return new ByteArrayInputStream(bytesOut);
+        return bytesOut;
     }
 }

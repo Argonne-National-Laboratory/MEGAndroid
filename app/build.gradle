@@ -18,12 +18,6 @@ dependencies {
 
 android {
     signingConfigs {
-        debug {
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
-            storeFile file('/Users/greg/.android/debug.keystore')
-            storePassword 'android'
-        }
         release {
             keyAlias 'release-main'
             storeFile file('/Users/greg/.android/release.keystore')
