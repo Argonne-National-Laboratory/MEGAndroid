@@ -109,19 +109,6 @@
     android:id="@+id/etPassword" />
 
   <Button
-    android:id="@+id/bHelp"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textColor="#ffffff"
-    android:background="@drawable/bhelp"
-    android:text="\?"
-    android:clickable="true"
-    android:enabled="true"
-    android:layout_alignBottom="@+id/imageView"
-    android:layout_alignParentRight="true"
-    android:layout_alignParentEnd="true" />
-
-  <Button
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:text="ADVANCED"
@@ -143,28 +130,6 @@
     android:layout_alignTop="@+id/bAdvanced"
     android:layout_alignRight="@+id/etPassword"
     android:layout_alignEnd="@+id/etPassword" />
-
-  <TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textAppearance="?android:attr/textAppearanceSmall"
-    android:text="Hide Password"
-    android:id="@+id/tvHidePass"
-    android:layout_below="@+id/etPassword"
-    android:layout_toLeftOf="@+id/checkBox"
-    android:layout_toStartOf="@+id/checkBox" />
-
-  <CheckBox
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:id="@+id/checkBox"
-    android:checked="false"
-    android:layout_below="@+id/bHelp"
-    android:layout_alignRight="@+id/etPassword"
-    android:layout_alignEnd="@+id/etPassword" />
-
-
-
 
 
 </RelativeLayout>
