@@ -24,7 +24,7 @@ public class Constants {
     public static final int IO_BUFFER_SIZE = 102400;
 
     // This will change in the future
-    public static final String MEG_API_URL = "http://grehm.us/megserver";
+    public static final String MEG_API_URL = "http://mobileencryptiongateway.org/megserver";
     // Just use this for debugging if we don't want to hit the server
     //public static final String MEG_API_URL = "http://foobar";
     public static final String PUT_MESSAGE_CONTENT_TYPE = "text/plain; charset=us-ascii";
