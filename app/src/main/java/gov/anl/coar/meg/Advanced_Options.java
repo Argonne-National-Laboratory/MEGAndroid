@@ -21,7 +21,8 @@ import gov.anl.coar.meg.service.KeyRevocationService;
  */
 public class Advanced_Options extends AppCompatActivity
         implements View.OnClickListener, Receiver {
-    Button bRevoke;
+    Button bDebugRemoveAES;
+    Button bRevokePGP;
     Button bSave;
 
     Intent mKeyRevocationService;
@@ -33,8 +34,10 @@ public class Advanced_Options extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_advanced_options);
 
-        bRevoke = (Button) findViewById(R.id.bRevoke);
-        bRevoke.setOnClickListener(this);
+        bRevokePGP = (Button) findViewById(R.id.bRevoke);
+        bRevokePGP.setOnClickListener(this);
+        bDebugRemoveAES = (Button) findViewById(R.id.bDebugRevokeAES);
+        bDebugRemoveAES.setOnClickListener(this);
         bSave = (Button) findViewById(R.id.bSave);
         bSave.setOnClickListener(this);
     }
@@ -63,6 +66,9 @@ public class Advanced_Options extends AppCompatActivity
             case R.id.bSave: {
                 startActivity(new Intent(this, Installation.class));
                 break;
+            }
+            case R.id.bDebugRevokeAES: {
+                Util.removeAESKey(this);
             }
         }
     }

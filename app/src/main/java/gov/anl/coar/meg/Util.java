@@ -188,4 +188,11 @@ public class Util {
             throw new Exception("Invalid number of iv bytes");
         }
     }
+
+    public static void removeAESKey(Context context) {
+        // This is a debug method and as such I'm not going to put much work into it.
+        try {
+            new File(context.getFilesDir(), Constants.SYMMETRICKEY_META_FILENAME).delete();
+        } catch (Exception e) {}
+    }
 }
