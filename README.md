@@ -59,8 +59,9 @@ Now you will have a new symmetic key pair to use when communicating with the cli
    - On the first line of the `local.properties` file put something like the following `sdk.dir=/path_to/sdk`.
      *Note: on Linux this will probably be something like* `sdk.dir=/home/user/Android/Sdk/`
 5. Leave the other settings on  the `Import Project from Gradle` screen at their defaults. Click `OK`.
-6. You should now be able to finish out the installation.
-7. When the setup is complete Android Studio will want to compile the code. When this process is finished, check the `Gradle` tab in the bottom right corner. If you see a message saying the build was successful, you are ready to install the app on your phone.
+6. If you see an error like "Cause: failed to find target with hash string 'android-23' in: /home/user/Android/Sdk" run /home/user/Android/Sdk/tools/android and select the version of the API that you're missing (23, for Android 6.0 in this example... you may also need Android SDK Build Tools 23.0.1) and install.
+7. You should now be able to finish out the installation.
+8. When the setup is complete Android Studio will want to compile the code. When this process is finished, check the `Gradle` tab in the bottom right corner. If you see a message saying the build was successful, you are ready to install the app on your phone.
 
 ##### Install the app on your phone
 1. Select `Run > Debug` from the menu (note in some versions of Android Studio you might need to select `installDebug` from the Installation tab). This should trigger the installation on your phone.
