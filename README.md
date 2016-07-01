@@ -65,6 +65,7 @@ Now you will have a new symmetic key pair to use when communicating with the cli
 
 ##### Install the app on your phone
 1. Select `Run > Debug` from the menu (note in some versions of Android Studio you might need to select `installDebug` from the Installation tab). This should trigger the installation on your phone.
+2. If your gradle build fails, you may have to install the 32bit libz, on ubuntu this is accomplished by `sudo apt-get install zlib1g:i386`
 2. After the installation completes, you'll need to give MEG the proper permissions on your phone. Enable the `Camera` by going to `Settings > Apps > MEG > Permissions`.
 
 ##### Troubleshooting
