@@ -2,9 +2,9 @@ package gov.anl.coar.meg;
 
 import android.app.FragmentManager;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -42,6 +42,7 @@ public class MainActivity extends FragmentActivity
 
     Button bInstall;
     Button bLogin;
+    Button bScan;
     Intent mInstanceIdIntent;
     MEGResultReceiver mReceiver;
 
@@ -61,6 +62,9 @@ public class MainActivity extends FragmentActivity
 
         bLogin = (Button) findViewById(R.id.bLogin);
         bLogin.setOnClickListener(this);
+
+        bScan = (Button) findViewById(R.id.bScan);
+        bScan.setOnClickListener(this);
 
         if (checkPlayServices()) {
             mReceiver = new MEGResultReceiver(new Handler());
@@ -98,6 +102,8 @@ public class MainActivity extends FragmentActivity
                     startActivity(new Intent(this, Login.class));
                 }
                 break;
+            case R.id.bScan:
+                startActivity(new Intent(this, QRManageActivity.class));
             default:
                 break;
         }

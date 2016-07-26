@@ -16,6 +16,7 @@ import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.PreviewCallback;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -24,6 +25,8 @@ import net.sourceforge.zbar.Image;
 import net.sourceforge.zbar.ImageScanner;
 import net.sourceforge.zbar.Symbol;
 import net.sourceforge.zbar.SymbolSet;
+
+import org.json.JSONObject;
 
 
 /**
@@ -35,6 +38,8 @@ public class ScanQRActivity extends Activity{
     private Handler autoFocusHandler;
     TextView scanText;
     ImageScanner scanner;
+
+    String TAG = "ScanQRActivity";
 
     private boolean previewing = true;
 
@@ -114,8 +119,20 @@ public class ScanQRActivity extends Activity{
                 for (Symbol sym : syms) {
                     scanText.setText("Processing ...");
                     try {
-                        Util.validateSymmetricKeyData(sym.getData());
-                        Util.writeSymmetricMetadataFile(getApplicationContext(), sym.getData());
+                        //Get sym key and clientID from QR
+                        Log.d(TAG, sym.getData());
+                        JSONObject QRInfo = new JSONObject(sym.getData());
+                        String aes = QRInfo.getString("aes");
+                        Log.d(TAG, aes);
+                        String clientId = QRInfo.getString("clientID");
+                        Log.d(TAG, clientId);
+
+                        //Ensure the sym key data is good
+                        Util.validateSymmetricKeyData(aes);
+
+                        //Write sym key to file named after clientId
+                        Util.writeSymmetricMetadataFile(getApplicationContext(), aes, clientId);
+
                         scanSuccess = true;
                     } catch (Exception e) {
                         scanText.setText("Something went wrong. Try again.");

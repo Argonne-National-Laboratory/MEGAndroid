@@ -56,29 +56,35 @@ public class MEGServerRequest {
     public void putEncryptedMessage(
             String email_to,
             String email_from,
+            String client_id,
+            String message_id,
             InputStream inBuffer
     )
             throws Exception
     {
         mCurRetries = 0;
-        putMessage(mServerUrl + ENCRYPTED_MSG_URL, email_to, email_from, inBuffer);
+        putMessage(mServerUrl + ENCRYPTED_MSG_URL, email_to, email_from, client_id, message_id, inBuffer);
     }
 
     public void putDecryptedMessage(
             String email_to,
             String email_from,
+            String client_id,
+            String message_id,
             InputStream inBuffer
     )
             throws Exception
     {
         mCurRetries = 0;
-        putMessage(mServerUrl + DECRYPTED_MSG_URL, email_to, email_from, inBuffer);
+        putMessage(mServerUrl + DECRYPTED_MSG_URL, email_to, email_from, client_id, message_id, inBuffer);
     }
 
     private void putMessage(
             String url,
             String email_to,
             String email_from,
+            String client_id,
+            String message_id,
             InputStream inBuffer
     )
             throws Exception
@@ -89,7 +95,9 @@ public class MEGServerRequest {
                     url, true,
                     "email_to", email_to,
                     "email_from", email_from,
-                    "action", Constants.TO_CLIENT_ACTION
+                    "action", Constants.TO_CLIENT_ACTION,
+                    "client_id", client_id,
+                    "message_id", message_id
             );
             request = request.header("Content-Type", Constants.PUT_MESSAGE_CONTENT_TYPE);
             HttpRequest response = request.send(inBuffer);
@@ -99,7 +107,7 @@ public class MEGServerRequest {
         if (mCurRetries < mMaxRetries) {
             mCurRetries += 1;
             TimeUnit.SECONDS.sleep(mRetryTimeout);
-            putMessage(url, email_to, email_from, inBuffer);
+            putMessage(url, email_to, email_from, client_id, message_id, inBuffer);
         }
         throw new Exception("Something went wrong. We could not put the message back onto the server");
     }

@@ -20,18 +20,23 @@ public class GCMListenerService extends GcmListenerService {
             Bundle data
     ) {
         try {
+            //Get info from GCM
             String action = data.getString("action");
+            String clientId = data.getString("client_id");
+            String messageId = data.getString("message_id");
             Log.d(TAG, "message received from: " + from);
             Log.d(TAG, "message action: " + action);
+
+            //Call appropriate action
             if (action.contains("decrypt")) {
-                String messageId = data.getString("message_id");
-                MEGMessage msg = MEGMessage.getEncryptedFromServer(messageId, this, getApplication());
+                MEGMessage msg = MEGMessage.getEncryptedFromServer(clientId, messageId, this, getApplication());
                 msg.performDecryptionFlow();
-            } else if (action.contains("encrypt")) {
-                String messageId = data.getString("message_id");
-                MEGMessage msg = MEGMessage.getDecryptedFromServer(messageId, this, getApplication());
+            }
+            else if (action.contains("encrypt")) {
+                MEGMessage msg = MEGMessage.getDecryptedFromServer(clientId, messageId, this, getApplication());
                 msg.performEncryptionFlow();
-            } else if (action.contains("revoke")) {
+            }
+            else if (action.contains("revoke")) {
                 Util.deleteAllFiles(this);
             }
         } catch (Exception e) {

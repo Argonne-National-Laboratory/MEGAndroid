@@ -224,12 +224,13 @@ public class EncryptionLogic {
      */
     public byte[] decryptClientSymmetricData(
             Context context,
-            byte[] bytesIn
+            byte[] bytesIn,
+            String clientId
     )
             throws IOException, InvalidCipherTextException
     {
         KeyGenerationLogic keygen = new KeyGenerationLogic();
-        BufferedBlockCipher cipher = keygen.generateSymmetricKeyFromQRData(context, false);
+        BufferedBlockCipher cipher = keygen.generateSymmetricKeyFromQRData(context, clientId, false);
         return performSymmetricKeyAction(cipher, bytesIn);
     }
 
@@ -244,12 +245,13 @@ public class EncryptionLogic {
      */
     public byte[] encryptAsClientBoundSymmetricData(
             Context context,
-            byte[] bytesIn
+            byte[] bytesIn,
+            String clientId
     )
             throws IOException, InvalidCipherTextException
     {
         KeyGenerationLogic keygen = new KeyGenerationLogic();
-        BufferedBlockCipher cipher = keygen.generateSymmetricKeyFromQRData(context, true);
+        BufferedBlockCipher cipher = keygen.generateSymmetricKeyFromQRData(context, clientId, true);
         return performSymmetricKeyAction(cipher, bytesIn);
     }
 

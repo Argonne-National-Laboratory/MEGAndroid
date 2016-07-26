@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import gov.anl.coar.meg.http.MEGServerRequest;
 
@@ -37,11 +36,15 @@ public class MEGMessage {
     private PGPPublicKey mPartnerPubKey;
     private String mEmailFrom;
     private String mEmailTo;
+    private String mMessageId;
+    private String mClientId;
 
     public MEGMessage(
             String message,
             String emailFrom,
             String emailTo,
+            String msgId,
+            String clientId,
             Context context,
             Application application,
             MEGServerRequest request,
@@ -50,6 +53,8 @@ public class MEGMessage {
         mOriginalMsg = message;
         mEmailFrom = emailFrom;
         mEmailTo = emailTo;
+        mMessageId = msgId;
+        mClientId = clientId;
         mCurMsg = Base64.decode(mOriginalMsg);
         mSigLogic = new SignatureLogic();
         mEncryptionLogic = new EncryptionLogic();
@@ -73,6 +78,7 @@ public class MEGMessage {
      * @throws Exception
      */
     public static MEGMessage getDecryptedFromServer(
+            String clientId,
             String messageId,
             Context context,
             Application application
@@ -80,13 +86,17 @@ public class MEGMessage {
             throws Exception
     {
         MEGServerRequest request = new MEGServerRequest();
+
+        //Get public key to encrypt with
         InputStream pubkeyStream = request.getAssociatedPublicKey(messageId);
         PGPPublicKey pubKey = MEGPublicKeyRing.fromInputStream(pubkeyStream).getMasterPublicKey();
+
+        //Get message contents
         JSONObject getResponse = request.getDecryptedMessage(messageId);
         String message = getResponse.getString("message");
         String emailFrom = getResponse.getString("email_from");
         String emailTo = getResponse.getString("email_to");
-        return new MEGMessage(message, emailFrom, emailTo, context, application, request, pubKey);
+        return new MEGMessage(message, emailFrom, emailTo, messageId, clientId, context, application, request, pubKey);
     }
 
     /**
@@ -100,6 +110,7 @@ public class MEGMessage {
      * @throws Exception
      */
     public static MEGMessage getEncryptedFromServer(
+            String clientId,
             String messageId,
             Context context,
             Application application
@@ -111,19 +122,19 @@ public class MEGMessage {
         String message = getResponse.getString("message");
         String emailFrom = getResponse.getString("email_from");
         String emailTo = getResponse.getString("email_to");
-        return new MEGMessage(message, emailFrom, emailTo, context, application, request, null);
+        return new MEGMessage(message, emailFrom, emailTo, messageId, clientId, context, application, request, null);
     }
 
     private void decryptWithClientSymKey()
             throws IOException, InvalidCipherTextException
     {
-        mCurMsg = mEncryptionLogic.decryptClientSymmetricData(mContext, mCurMsg);
+        mCurMsg = mEncryptionLogic.decryptClientSymmetricData(mContext, mCurMsg, mClientId);
     }
 
     private void encryptWithClientSymKey()
             throws IOException, InvalidCipherTextException
     {
-        mCurMsg = mEncryptionLogic.encryptAsClientBoundSymmetricData(mContext, mCurMsg);
+        mCurMsg = mEncryptionLogic.encryptAsClientBoundSymmetricData(mContext, mCurMsg, mClientId);
     }
 
     private void encryptMessage()
@@ -162,14 +173,14 @@ public class MEGMessage {
             throws Exception
     {
         ByteArrayInputStream bais = new ByteArrayInputStream(Base64.encode(mCurMsg));
-        mServerRequest.putEncryptedMessage(mEmailTo, mEmailFrom, bais);
+        mServerRequest.putEncryptedMessage(mEmailTo, mEmailFrom, mClientId, mMessageId, bais);
     }
 
     private void submitDecryptedToServer()
         throws Exception
     {
         ByteArrayInputStream bais = new ByteArrayInputStream(Base64.encode(mCurMsg));
-        mServerRequest.putDecryptedMessage(mEmailTo, mEmailFrom, bais);
+        mServerRequest.putDecryptedMessage(mEmailTo, mEmailFrom, mClientId, mMessageId, bais);
     }
 
     public void performEncryptionFlow()

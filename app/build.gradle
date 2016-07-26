@@ -18,6 +18,7 @@ dependencies {
     compile 'com.madgag.spongycastle:core:1.54.0.0'
     compile 'com.madgag.spongycastle:pg:1.54.0.0'
     compile 'me.dm7.barcodescanner:zbar:1.8.4'
+    compile 'com.android.support:design:23.4.0'
 }
 
 android {

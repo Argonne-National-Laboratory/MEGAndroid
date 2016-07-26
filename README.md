@@ -25,7 +25,10 @@ Now you will have a new symmetic key pair to use when communicating with the cli
 ### For Developers
 
 #### OSX
-[Needed]
+##### Install the needed software (OSX)
+
+1. Java Development Kit (JDK) 8
+2. Android Studio
 
 #### Windows
 [Needed]

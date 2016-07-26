@@ -151,11 +151,12 @@ public class KeyGenerationLogic {
      */
     public BufferedBlockCipher generateSymmetricKeyFromQRData(
             Context context,
+            String clientId,
             boolean forEncryption
     )
             throws IOException
     {
-        ArrayList<byte[]> data = Util.getAESKeyData(context);
+        ArrayList<byte[]> data = Util.getAESKeyData(context, clientId);
         return generateSymmetricKey(data.get(0), data.get(1), forEncryption);
     }
 

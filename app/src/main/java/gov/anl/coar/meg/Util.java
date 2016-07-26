@@ -1,6 +1,7 @@
 package gov.anl.coar.meg;
 
 import android.content.Context;
+import android.util.Log;
 
 import org.spongycastle.bcpg.ArmoredOutputStream;
 import org.spongycastle.openpgp.PGPPublicKey;
@@ -18,7 +19,6 @@ import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Scanner;
-
 /**
  * Created by greg on 2/29/16.
  */
@@ -148,22 +148,27 @@ public class Util {
      */
     public static void writeSymmetricMetadataFile(
             Context context,
-            String data
+            String data,
+            String clientId
     )
             throws IOException
     {
-        File file = new File(context.getFilesDir(), Constants.SYMMETRICKEY_META_FILENAME);
+        File file = new File(context.getFilesDir(), clientId.concat(".sym"));
         PrintWriter out = new PrintWriter(file);
         out.println(data);
         out.close();
+        for (int i = 0; i < context.getFilesDir().listFiles().length; i++) {
+            Log.d("Sym Key Files", context.getFilesDir().listFiles()[i].getName());
+        }
     }
 
     public static ArrayList<byte[]> getAESKeyData(
-            Context context
+            Context context,
+            String clientId
     )
             throws IOException
     {
-        File file = new File(context.getFilesDir(), Constants.SYMMETRICKEY_META_FILENAME);
+        File file = new File(context.getFilesDir(), clientId.concat(".sym"));
         FileInputStream in = new FileInputStream(file);
         String [] dataArray = inputBufferToString(in).split(Constants.SYMMETRIC_KEY_FIELD_DELIMETER);
         in.close();
@@ -189,10 +194,25 @@ public class Util {
         }
     }
 
+    public static void deleteSymmetricKeyFile(
+            Context context,
+            String clientId
+    )
+    {
+        new File(context.getFilesDir(), clientId).delete();
+        Log.d("Sym Key Files", "Deleted: ".concat(clientId));
+    }
+
     public static void removeAESKey(Context context) {
         // This is a debug method and as such I'm not going to put much work into it.
         try {
-            new File(context.getFilesDir(), Constants.SYMMETRICKEY_META_FILENAME).delete();
+            File[] files = context.getFilesDir().listFiles();
+            for (int i = 0; i < files.length; i++) {
+                if (files[i].getName().contains(".sym")) {
+                    new File(context.getFilesDir(), files[i].getName()).delete();
+                    //Log.d("Sym Key Files", "Deleted: ".concat(files[i].getName()));
+                }
+            }
         } catch (Exception e) {}
     }
 }
