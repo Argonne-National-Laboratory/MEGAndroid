@@ -71,6 +71,7 @@ public class MEGMessage {
      * from the server with the intention of encrypting it and sending it back to the
      * client for eventual transmission.
      *
+     * @param clientId
      * @param messageId
      * @param context
      * @param application
@@ -103,6 +104,7 @@ public class MEGMessage {
      * Secondary constructor for MEGMessage. Gets an encrypted from the server for the eventual
      * goal of decrypting the message.
      *
+     * @param clientId
      * @param messageId
      * @param context
      * @param application
@@ -158,7 +160,6 @@ public class MEGMessage {
     private void validateSignature()
             throws Exception
     {
-        Log.d(TAG, "validate message signature");
         ArrayList<byte[]> array = mSigLogic.splitSignatureAndMessage(mCurMsg);
         byte[] signature = array.get(0);
         mCurMsg = array.get(1);
@@ -173,14 +174,14 @@ public class MEGMessage {
             throws Exception
     {
         ByteArrayInputStream bais = new ByteArrayInputStream(Base64.encode(mCurMsg));
-        mServerRequest.putEncryptedMessage(mEmailTo, mEmailFrom, mClientId, mMessageId, bais);
+        mServerRequest.putEncryptedMessage(mEmailTo, mEmailFrom, mMessageId, bais);
     }
 
     private void submitDecryptedToServer()
         throws Exception
     {
         ByteArrayInputStream bais = new ByteArrayInputStream(Base64.encode(mCurMsg));
-        mServerRequest.putDecryptedMessage(mEmailTo, mEmailFrom, mClientId, mMessageId, bais);
+        mServerRequest.putDecryptedMessage(mEmailTo, mEmailFrom, mMessageId, bais);
     }
 
     public void performEncryptionFlow()
