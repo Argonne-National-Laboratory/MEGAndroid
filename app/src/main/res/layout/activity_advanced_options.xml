@@ -1,4 +1,4 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
   android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
   android:paddingRight="@dimen/activity_horizontal_margin"
@@ -7,56 +7,73 @@
   tools:context="gov.anl.coar.meg.Advanced_Options">
 
 
-  <Button
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Revoke PGP Key"
-    android:id="@+id/bRevoke"
-    android:layout_alignParentBottom="true"
-    android:layout_alignParentLeft="true"
-    android:layout_alignParentStart="true"
-    android:layout_marginBottom="37dp"
-    android:background="#FF0000"
-    android:textColor="#FFFFFF"
-    android:paddingLeft="20dp"
-    android:paddingRight="20dp"
-    android:layout_marginLeft="20dp"/>
+  <TableRow
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:paddingEnd="0dp"
+      android:paddingStart="0dp"
+      android:gravity="center"
+      android:layout_marginTop="10dp"
+      android:layout_marginBottom="10dp">
 
-  <Button
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Save"
-    android:id="@+id/bSave"
-    android:layout_alignTop="@+id/bRevoke"
-    android:layout_alignParentRight="true"
-    android:layout_alignParentEnd="true"
-    android:background="#66ba6a"
-    android:layout_marginRight="20dp"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Backup Key"
+        android:id="@+id/bBackup"
+        android:background="#4259f4"
+        android:textColor="#FFFFFF"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:drawableTop="@drawable/backup"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@+id/tvIrreversible"
+        android:layout_alignRight="@+id/bRevoke"
+        android:layout_alignEnd="@+id/bRevoke" />
+  </TableRow>
 
-  <TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textAppearance="?android:attr/textAppearanceSmall"
-    android:text="(Irreversible)"
-    android:id="@+id/tvIrreversible"
-    android:layout_below="@+id/bSave"
-    android:layout_alignEnd="@+id/bRevoke"
-    android:layout_alignRight="@+id/bRevoke"
-    android:layout_marginEnd="20dp"
-    android:layout_marginRight="20dp"
-    android:layout_marginTop="5dp"/>
+  <TableRow
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:gravity="center"
+      android:layout_marginBottom="10dp">
 
-  <Button
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="DEBUG: REVOKE AES SYMMETRIC"
-      android:id="@+id/bDebugRevokeAES"
-      android:background="#FF0000"
+    <Button
+        android:text="DEBUG: REVOKE AES SYMMETRIC"
+        android:id="@+id/bDebugRevokeAES"
+        android:background="#ff6f00"
+        android:textColor="#FFFFFF"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/tvIrreversible"
+        android:layout_toRightOf="@+id/tvIrreversible"
+        android:layout_column="0" />
+  </TableRow>
+
+  <TableRow
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:gravity="center">
+
+    <Button
+        android:text="Revoke PGP Key"
+      android:id="@+id/bRevoke"
+        android:background="#FF0000"
       android:textColor="#FFFFFF"
       android:paddingLeft="20dp"
       android:paddingRight="20dp"
-      android:layout_alignParentTop="true"
-      android:layout_alignLeft="@+id/bRevoke"
-      android:layout_alignStart="@+id/bRevoke" />
+        android:drawableTop="@drawable/delete"
+        android:layout_alignBaseline="@+id/tvIrreversible"
+        android:layout_alignBottom="@+id/tvIrreversible"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_column="0"
+        android:layout_gravity="center_vertical" />
+  </TableRow>
 
-</RelativeLayout>
+</TableLayout>
