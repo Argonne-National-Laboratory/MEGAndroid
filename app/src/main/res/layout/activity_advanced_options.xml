@@ -28,10 +28,30 @@
         android:drawableTop="@drawable/backup"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+  </TableRow>
+
+  <TableRow
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:gravity="center"
+      android:layout_marginBottom="10dp">
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Restore Key From Backup"
+        android:id="@+id/bRestore"
+        android:background="#9859a6"
+        android:textColor="#FFFFFF"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:drawableTop="@drawable/ic_action_name"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_toStartOf="@+id/tvIrreversible"
-        android:layout_alignRight="@+id/bRevoke"
-        android:layout_alignEnd="@+id/bRevoke" />
+        android:layout_column="0"
+        android:contextClickable="false" />
   </TableRow>
 
   <TableRow
@@ -62,18 +82,19 @@
 
     <Button
         android:text="Revoke PGP Key"
-      android:id="@+id/bRevoke"
+        android:id="@+id/bRevoke"
         android:background="#FF0000"
-      android:textColor="#FFFFFF"
-      android:paddingLeft="20dp"
-      android:paddingRight="20dp"
+        android:textColor="#FFFFFF"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
         android:drawableTop="@drawable/delete"
-        android:layout_alignBaseline="@+id/tvIrreversible"
-        android:layout_alignBottom="@+id/tvIrreversible"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_column="0"
-        android:layout_gravity="center_vertical" />
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignBaseline="@+id/tvIrreversible"
+        android:layout_alignBottom="@+id/tvIrreversible"
+        android:layout_column="0" />
   </TableRow>
 
 </TableLayout>

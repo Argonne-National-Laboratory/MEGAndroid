@@ -8,6 +8,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -32,11 +33,12 @@ public class Advanced_Options extends AppCompatActivity
         implements View.OnClickListener, Receiver {
     Button bDebugRemoveAES;
     Button bRevokePGP;
-    Button bSave;
     Button bBackup;
+    Button bRestore;
 
     Intent mKeyRevocationService;
     MEGResultReceiver mReceiver;
+    private static final String TAG = "Advanced_Options";
 
 	/** Default method */
     @Override
@@ -48,13 +50,13 @@ public class Advanced_Options extends AppCompatActivity
         bRevokePGP.setOnClickListener(this);
         bDebugRemoveAES = (Button) findViewById(R.id.bDebugRevokeAES);
         bDebugRemoveAES.setOnClickListener(this);
-        bSave = (Button) findViewById(R.id.bSave);
-        bSave.setOnClickListener(this);
         bBackup = (Button) findViewById(R.id.bBackup);
         bBackup.setOnClickListener(this);
+        bRestore = (Button) findViewById(R.id.bRestore);
+        bRestore.setOnClickListener(this);
     }
 
-    private AlertDialog alertBuilder(int messageId) {
+    private AlertDialog intMsgAlertBuilder(int messageId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(messageId);
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
@@ -63,6 +65,14 @@ public class Advanced_Options extends AppCompatActivity
         return builder.create();
     }
 
+    private AlertDialog strMsgAlertBuilder(String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(message);
+        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {}
+        });
+        return builder.create();
+    }
 
     @Override
     public void onClick(View v) {
@@ -75,40 +85,56 @@ public class Advanced_Options extends AppCompatActivity
                 startService(mKeyRevocationService);
                 break;
             }
-            case R.id.bSave: {
-                startActivity(new Intent(this, Installation.class));
-                break;
-            }
             case R.id.bDebugRevokeAES: {
                 Util.removeAESKey(this);
             }
             case R.id.bBackup: {
-                try {
-                    backupKey(v.getContext());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                backupKey(v.getContext());
+            }
+            case R.id.bRestore: {
+                restoreKey(v.getContext());
             }
         }
     }
 
-    private void backupKey(Context context) throws Exception {
+    private void checkStorageState() throws Exception {
+        String state = Environment.getExternalStorageState();
+        Log.d(TAG, "Storage state is: " + state);
+        if (!Environment.MEDIA_MOUNTED.equals(state)) {
+            throw new Exception("External storage is not writable!");
+        }
+        if (Environment.isExternalStorageEmulated()) {
+            throw new Exception("External storage is emulated. Not currently writable!");
+        }
+    }
+
+    private void restoreKey(Context context) {
         try {
-            String state = Environment.getExternalStorageState();
-            if (!Environment.MEDIA_MOUNTED.equals(state)) {
-                throw new Exception("External storage is not writable!");
-            }
+            checkStorageState();
             File backupFile = new File(
                     context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),
                     Constants.SECRETKEYRING_FILENAME);
+        } catch (Exception e) {
+            strMsgAlertBuilder("Unable to restore key from USB. Did you plug in a USB drive?");
+        }
+    }
+
+    private void backupKey(Context context) {
+        try {
+            checkStorageState();
+            File backupFile = new File(
+                    context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),
+                    Constants.SECRETKEYRING_FILENAME);
+            Log.i(TAG, backupFile.getAbsolutePath());
             FileInputStream fis = context.openFileInput(Constants.SECRETKEYRING_FILENAME);
             FileOutputStream fos = new FileOutputStream(backupFile);
             fos.write(Util.inputStreamToOutputStream(fis).toByteArray());
             fis.close();
             fos.close();
         } catch (FileNotFoundException e) {
-            // TODO Something Something you didn't create the key yet.
-            e.printStackTrace();
+            strMsgAlertBuilder("There is no key on the phone to backup! Please register for MEG first.").show();
+        } catch (Exception e) {
+            strMsgAlertBuilder("Unable to backup key. Did you plug in a USB drive?").show();
         }
     }
 
@@ -117,7 +143,7 @@ public class Advanced_Options extends AppCompatActivity
         // The user can try again. We don't want to continually serve them
         // up error warnings
         if (resultCode != ReceiverCode.IID_CODE_SUCCESS) {
-            alertBuilder(resultData.getInt(Constants.ALERT_MESSAGE_KEY)).show();
+            intMsgAlertBuilder(resultData.getInt(Constants.ALERT_MESSAGE_KEY)).show();
         }
         stopService(mKeyRevocationService);
     }
