@@ -86,13 +86,19 @@ public class Advanced_Options extends AppCompatActivity
                 break;
             }
             case R.id.bDebugRevokeAES: {
+                Log.i(TAG, "Remove AES key");
                 Util.removeAESKey(this);
+                break;
             }
             case R.id.bBackup: {
+                Log.i(TAG, "Backup private key");
                 backupKey(v.getContext());
+                break;
             }
             case R.id.bRestore: {
+                Log.i(TAG, "Restore private key");
                 restoreKey(v.getContext());
+                break;
             }
         }
     }
@@ -115,7 +121,7 @@ public class Advanced_Options extends AppCompatActivity
                     context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),
                     Constants.SECRETKEYRING_FILENAME);
         } catch (Exception e) {
-            strMsgAlertBuilder("Unable to restore key from USB. Did you plug in a USB drive?");
+            strMsgAlertBuilder("Unable to restore key from USB. Did you plug in a USB drive?").show();
         }
     }
 
