@@ -1,9 +1,13 @@
 package gov.anl.coar.meg;
 
+import android.*;
+import android.app.AlertDialog;
 import android.app.FragmentManager;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -75,6 +79,8 @@ public class MainActivity extends FragmentActivity
         } else {
             // TODO Some kind of warning to do something to set up google play services
         }
+
+        requestCameraPermissions();
     }
 
     /** Instantiate new intents on button clicks
@@ -163,4 +169,14 @@ public class MainActivity extends FragmentActivity
             stopService(mInstanceIdIntent);
         }
     }
+
+    private void requestCameraPermissions() {
+        // Do we need to ask for camera permissions?
+        if (ActivityCompat.checkSelfPermission(this,
+                android.Manifest.permission.CAMERA) == -1) {
+            // Request them if so
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{android.Manifest.permission.CAMERA}, 1);
+        }
+    }
+
 }

@@ -1,17 +1,17 @@
 {
   "project_info": {
-    "project_id": "meg-encryption-gateway",
-    "project_number": "306816001524",
+    "project_id": "meg-server",
+    "project_number": "741314142758",
     "name": "MEG-encryption-gateway"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:306816001524:android:bf86ed9b0736ff03",
+        "mobilesdk_app_id": "1:741314142758:android:d0ca3c532221aca3",
         "client_id": "android:gov.anl.coar.meg",
         "client_type": 1,
         "android_client_info": {
-          "package_name": "gov.anl.coar.meg",
+          "package_name": "com.meg",
           "certificate_hash": []
         }
       },

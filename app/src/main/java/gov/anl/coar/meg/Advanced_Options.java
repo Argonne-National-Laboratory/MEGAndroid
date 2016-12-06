@@ -6,9 +6,9 @@ import android.content.Intent;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import gov.anl.coar.meg.receiver.MEGResultReceiver;
 import gov.anl.coar.meg.receiver.MEGResultReceiver.Receiver;
@@ -18,6 +18,7 @@ import gov.anl.coar.meg.service.KeyRevocationService;
 /** Class to provide functionality to the Advanced Options page of MEG
  *
  * @author Bridget Basan
+ * @author Joshua Lyle
  */
 public class Advanced_Options extends AppCompatActivity
         implements View.OnClickListener, Receiver {
@@ -61,6 +62,10 @@ public class Advanced_Options extends AppCompatActivity
                 mKeyRevocationService = new Intent(this, KeyRevocationService.class);
                 mKeyRevocationService.putExtra(Constants.RECEIVER_KEY, mReceiver);
                 startService(mKeyRevocationService);
+
+                // Popup message to let the know user know the email was sent
+                Toast.makeText(v.getContext(), "Sent Revocation Confirmation Email", Toast.LENGTH_SHORT).show();
+
                 break;
             }
             case R.id.bSave: {

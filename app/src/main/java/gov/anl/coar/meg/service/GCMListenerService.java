@@ -25,6 +25,7 @@ public class GCMListenerService extends GcmListenerService {
             String clientId = data.getString("client_id");
             String messageId = data.getString("message_id");
             Log.d(TAG, "message received from: " + from);
+            Log.d(TAG, "message has id: " + messageId);
             Log.d(TAG, "message action: " + action);
 
             //Call appropriate action

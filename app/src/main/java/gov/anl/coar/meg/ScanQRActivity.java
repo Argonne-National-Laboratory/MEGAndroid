@@ -62,15 +62,15 @@ public class ScanQRActivity extends Activity{
         scanner.setConfig(0, Config.Y_DENSITY, 3);
 
         mPreview = new CameraPreview(this, mCamera, previewCb, autoFocusCB);
-        FrameLayout preview = (FrameLayout)findViewById(R.id.cameraPreview);
+        FrameLayout preview = (FrameLayout) findViewById(R.id.cameraPreview);
         preview.addView(mPreview);
 
-        scanText = (TextView)findViewById(R.id.scanText);
+        scanText = (TextView) findViewById(R.id.scanText);
     }
 
     public void onPause() {
         super.onPause();
-        releaseCamera();
+        //releaseCamera();
     }
 
     /** A safe way to get an instance of the Camera object. */
@@ -109,6 +109,7 @@ public class ScanQRActivity extends Activity{
 
             int result = scanner.scanImage(barcode);
             boolean scanSuccess = false;
+            String clientId = "";
 
             if (result != 0) {
                 previewing = false;
@@ -124,7 +125,7 @@ public class ScanQRActivity extends Activity{
                         JSONObject QRInfo = new JSONObject(sym.getData());
                         String aes = QRInfo.getString("aes");
                         Log.d(TAG, aes);
-                        String clientId = QRInfo.getString("clientID");
+                        clientId = QRInfo.getString("clientID");
                         Log.d(TAG, clientId);
 
                         //Ensure the sym key data is good
@@ -140,8 +141,14 @@ public class ScanQRActivity extends Activity{
                     }
                 }
             }
+
+            // If the client was scanned successfully, send the clientID
+            // to the QRManage activity to give it a name
             if (scanSuccess) {
-                startActivity(new Intent(getApplicationContext(), Login.class));
+                Intent i = new Intent(getApplicationContext(), QRManageActivity.class);
+                i.putExtra("clientID", clientId);
+                i.putExtra("action", "nameClientKey");
+                startActivity(i);
             }
         }
     };

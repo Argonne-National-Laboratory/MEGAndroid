@@ -240,9 +240,10 @@ public class MEGServerRequest {
     {
         keyId = cutKeyId(keyId);
         String url = mServerUrl + REVOKE_KEY_URL;
-        Log.d(TAG, "Request revoke key for key id: " + keyId);
+        Log.d(TAG, "Request revoke for key id: " + keyId);
         try {
             HttpRequest response = HttpRequest.post(url, true, "keyid", keyId);
+            Log.d(TAG, "Revocation request email sent: " + response.ok());
             if (response.ok())
                 return;
         } catch (Exception e) {

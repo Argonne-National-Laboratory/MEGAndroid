@@ -178,6 +178,23 @@ public class Util {
         return response;
     }
 
+    public static String getClientIdFromName(
+            Context context,
+            String clientName
+    )
+        throws IOException
+    {
+        String clientId = "";
+        File file = new File(context.getFilesDir(), clientName.concat(".id"));
+        try {
+            clientId = new BufferedReader(new FileReader(file)).readLine();
+        }
+        catch (Exception e) {
+            Log.d("Util", "Couldn't read from symm key name file");
+        }
+        return clientId;
+    }
+
     public static void validateSymmetricKeyData(
             String data
     )
@@ -196,11 +213,37 @@ public class Util {
 
     public static void deleteSymmetricKeyFile(
             Context context,
-            String clientId
+            String clientName
     )
     {
-        new File(context.getFilesDir(), clientId).delete();
-        Log.d("Sym Key Files", "Deleted: ".concat(clientId));
+        String clientId = "";
+        try {
+            clientId = getClientIdFromName(context, clientName);
+        }
+        catch (Exception e) {
+            Log.d("Util", "Couldn't read from symm key name file");
+        }
+
+        new File(context.getFilesDir(), clientId.concat(".sym")).delete();
+        Log.d("Sym Key Files", "Deleted: ".concat(clientId.concat(".sym")));
+        new File(context.getFilesDir(), clientName.concat(".id")).delete();
+        Log.d("Sym Key Files", "Deleted: ".concat(clientName.concat(".id")));
+    }
+
+    public static void writeSymmetricKeyNameFile(
+            Context context,
+            String clientName,
+            String clientId
+    )
+            throws IOException
+    {
+        File file = new File(context.getFilesDir(), clientName.concat(".id"));
+        PrintWriter out = new PrintWriter(file);
+        out.println(clientId);
+        out.close();
+        for (int i = 0; i < context.getFilesDir().listFiles().length; i++) {
+            Log.d("Sym Key Files", context.getFilesDir().listFiles()[i].getName());
+        }
     }
 
     public static void removeAESKey(Context context) {
@@ -208,7 +251,9 @@ public class Util {
         try {
             File[] files = context.getFilesDir().listFiles();
             for (int i = 0; i < files.length; i++) {
-                if (files[i].getName().contains(".sym")) {
+                if (files[i].getName().contains(".sym") ||
+                    files[i].getName().contains(".id"))
+                {
                     new File(context.getFilesDir(), files[i].getName()).delete();
                     //Log.d("Sym Key Files", "Deleted: ".concat(files[i].getName()));
                 }

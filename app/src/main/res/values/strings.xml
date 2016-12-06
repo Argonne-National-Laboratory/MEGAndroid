@@ -9,7 +9,7 @@
     <string name="something_wrong_pgp_msg">Something went wrong when creating your PGP key. Try again.</string>
     <string name="already_created_key_msg">You have already created a PGP key. Did you forget your password?</string>
     <string name="enter_password_msg">Enter key password</string>
-    <string name="enter_client_name_msg">Enter client name</string>
+    <string name="enter_client_name_msg">Enter name for client</string>
     <string name="cancel">Cancel</string>
     <string name="password">password</string>
     <string name="retry">Retry</string>
