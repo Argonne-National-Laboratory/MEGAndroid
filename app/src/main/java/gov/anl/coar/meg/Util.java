@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 /**
  * Created by greg on 2/29/16.
+ * Edited by Joshua Lyle
  */
 public class Util {
 
@@ -74,7 +75,16 @@ public class Util {
     public static boolean doesSymmetricKeyExist(
             Context context
     ) {
-        return doesKeyFileExist(context, Constants.SYMMETRICKEY_META_FILENAME);
+        try {
+            File[] files = context.getFilesDir().listFiles();
+            for (int i = 0; i < files.length; i++) {
+                if (files[i].getName().contains(".sym"))
+                {
+                    return true;
+                }
+            }
+        } catch (Exception e) {}
+        return false;
     }
 
     public static String getConfigVar(Context context, String varFilename) {

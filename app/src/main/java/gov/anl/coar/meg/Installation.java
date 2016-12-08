@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -29,6 +30,7 @@ import gov.anl.coar.meg.service.KeyRegistrationService;
  *
  * @author Bridget Basan
  * @author Greg Rehm
+ * Edited by Joshua Lyle
  */
 public class Installation extends AppCompatActivity
     implements View.OnClickListener, Receiver {
@@ -126,7 +128,8 @@ public class Installation extends AppCompatActivity
         builder.setMessage(R.string.install_alert_msg);
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                startActivity(new Intent(((Dialog) dialog).getContext(), ScanQRActivity.class));
+                //startActivity(new Intent(((Dialog) dialog).getContext(), ScanQRActivity.class));
+                Toast.makeText(getApplicationContext(), "Registration Completed", Toast.LENGTH_LONG).show();
             }
         });
         return builder.create();

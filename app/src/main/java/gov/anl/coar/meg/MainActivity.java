@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
@@ -14,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -37,6 +39,7 @@ import gov.anl.coar.meg.service.GCMInstanceIdRegistrationService;
  *
  * @author Bridget Basan
  * @author Greg Rehm
+ * Edited by Joshua Lyle
  */
 public class MainActivity extends FragmentActivity
     implements View.OnClickListener, Receiver{
@@ -47,6 +50,7 @@ public class MainActivity extends FragmentActivity
     Button bInstall;
     Button bLogin;
     Button bScan;
+    ImageView imgCheck;
     Intent mInstanceIdIntent;
     MEGResultReceiver mReceiver;
 
@@ -69,6 +73,9 @@ public class MainActivity extends FragmentActivity
 
         bScan = (Button) findViewById(R.id.bScan);
         bScan.setOnClickListener(this);
+
+        imgCheck = (ImageView) findViewById(R.id.imgCheck);
+        setImgCheckVisibility();
 
         if (checkPlayServices()) {
             mReceiver = new MEGResultReceiver(new Handler());
@@ -103,9 +110,9 @@ public class MainActivity extends FragmentActivity
                     EnterPasswordDialog epd = new EnterPasswordDialog();
                     epd.show(fm, TAG);
                 } else if (!Util.doesSymmetricKeyExist(this) && !cache.needsRefresh()) {
-                    startActivity(new Intent(this, ScanQRActivity.class));
+                    //startActivity(new Intent(this, ScanQRActivity.class));
                 } else {
-                    startActivity(new Intent(this, Login.class));
+                    //startActivity(new Intent(this, Login.class));
                 }
                 break;
             case R.id.bScan:
@@ -179,4 +186,22 @@ public class MainActivity extends FragmentActivity
         }
     }
 
+    protected void setImgCheckVisibility() {
+        //Check if the private key needs to be unlocked and set the clickability
+        //of the button and the indicator visiblity appropriately
+        PrivateKeyCache cache = (PrivateKeyCache) getApplication();
+        if (cache.needsRefresh()) {
+            imgCheck.setVisibility(View.INVISIBLE);
+            bLogin.setClickable(true);
+            bLogin.setText("LOG IN");
+            bLogin.setBackgroundColor(Color.parseColor("#66ba6a"));
+        }
+        else {
+            imgCheck.setVisibility(View.VISIBLE);
+            bLogin.setClickable(false);
+            bLogin.setText("LOGGED IN");
+            bLogin.setBackgroundColor(Color.GRAY);
+
+        }
+    }
 }

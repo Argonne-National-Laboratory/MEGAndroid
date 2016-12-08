@@ -31,6 +31,7 @@ import org.json.JSONObject;
 
 /**
  * Created by greg on 4/15/16.
+ * Edited by Joshua Lyle
  */
 public class ScanQRActivity extends Activity{
     private Camera mCamera;
@@ -148,7 +149,15 @@ public class ScanQRActivity extends Activity{
                 Intent i = new Intent(getApplicationContext(), QRManageActivity.class);
                 i.putExtra("clientID", clientId);
                 i.putExtra("action", "nameClientKey");
-                startActivity(i);
+                if (getCallingActivity().getClassName().equals("gov.anl.coar.meg.QRManageActivity")) {
+                    Log.d("QRManage", "Finishing");
+                    setResult(Activity.RESULT_OK, i);
+                    finish();
+                }
+                else {
+                    Log.d("QRManage", "Did not use finish");
+                }
+                    //startActivity(i);
             }
         }
     };

@@ -43,14 +43,17 @@
             android:label="@string/title_activity_installation" />
         <activity
             android:name=".Advanced_Options"
-            android:label="Advanced Options" />
+            android:label="@string/title_activity_advanced__options" />
         <activity
             android:name=".Login"
             android:label="Login"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ScanQRActivity"
-            android:label="ScanQRActivity" />
+            android:label="Scan QR" />
+        <activity
+            android:name=".QRManageActivity"
+            android:label="@string/title_activity_qrmanage" />
 
         <receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"
@@ -85,7 +88,6 @@
             android:name=".service.KeyRegistrationService"
             android:exported="false" />
 
-        <activity android:name=".QRManageActivity"></activity>
     </application>
 
 </manifest>

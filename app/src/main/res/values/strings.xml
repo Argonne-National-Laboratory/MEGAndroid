@@ -1,9 +1,10 @@
 <resources>
     <string name="app_name">MEG</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_installation">Installation</string>
+    <string name="title_activity_installation">Registration</string>
     <string name="title_activity_login">Login</string>
     <string name="title_activity_advanced__options">Advanced_Options</string>
+    <string name="title_activity_qrmanage">QR Key Management</string>
     <string name="ok">OKAY</string>
     <string name="install_alert_msg">This password will be your private key password. Do not share this with anyone.</string>
     <string name="something_wrong_pgp_msg">Something went wrong when creating your PGP key. Try again.</string>
@@ -16,7 +17,6 @@
     <string name="incorrect_password_msg">The entered password was incorrect. Retry or Quit?</string>
     <string name="something_wrong_server_msg">Something went wrong with the request. Try again</string>
     <string name="no_key_to_revoke_msg">There is no key to revoke! Create one first.</string>
-    <string name="title_activity_qrmanage">QRManageActivity</string>
     <string name="large_text">
         "Material is the metaphor.\n\n"
 

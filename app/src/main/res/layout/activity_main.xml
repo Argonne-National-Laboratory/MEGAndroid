@@ -1,5 +1,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
   android:paddingLeft="@dimen/activity_horizontal_margin"
@@ -39,7 +40,7 @@
     android:background="#66ba6a"
     android:textColor="#FFFFFF"
       android:focusable="true"
-    android:focusableInTouchMode="true"
+    android:focusableInTouchMode="false"
       android:layout_below="@+id/textView"
       android:layout_alignLeft="@+id/bInstall"
       android:layout_alignStart="@+id/bInstall"
@@ -49,14 +50,15 @@
   <Button
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:text="INSTALLATION"
+    android:text="REGISTER AN ACCOUNT"
     android:id="@+id/bInstall"
     android:background="#66ba6a"
     android:textColor="#FFFFFF"
     android:layout_below="@+id/textView2"
     android:layout_marginLeft="40dp"
     android:layout_marginRight="40dp"
-    android:layout_centerHorizontal="true" />
+    android:layout_centerHorizontal="true"
+      android:focusableInTouchMode="false" />
 
   <Button
       android:layout_width="match_parent"
@@ -65,11 +67,26 @@
       android:id="@+id/bScan"
       android:background="#66ba6a"
       android:textColor="#FFFFFF"
-      android:focusable="true"
-      android:focusableInTouchMode="true"
+      android:focusable="false"
       android:layout_below="@+id/textView"
       android:layout_alignRight="@+id/bInstall"
       android:layout_alignEnd="@+id/bInstall"
       android:layout_marginLeft="200dp" />
+
+  <ImageView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:id="@+id/imgCheck"
+      android:paddingEnd="8dp"
+      android:paddingRight="8dp"
+      android:visibility="visible"
+      android:adjustViewBounds="true"
+      android:cropToPadding="true"
+      android:scaleType="fitCenter"
+      android:src="@drawable/check"
+      android:layout_toLeftOf="@+id/bLogin"
+      android:layout_toStartOf="@+id/bLogin"
+      android:layout_alignTop="@+id/bLogin"
+      android:layout_alignBottom="@+id/bLogin" />
 
 </RelativeLayout>
