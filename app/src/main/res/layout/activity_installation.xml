@@ -109,27 +109,32 @@
     android:id="@+id/etPassword" />
 
   <Button
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:text="ADVANCED"
-    android:id="@+id/bAdvanced"
-    android:background="#66ba6a"
+      android:id="@+id/bRevoke"
+    android:background="#FF0000"
     android:textColor="#FFFFFF"
-    android:layout_alignParentBottom="true"
-    android:layout_alignLeft="@+id/imageView2"
-    android:layout_alignStart="@+id/imageView2"
-    android:layout_marginBottom="31dp" />
+      android:layout_below="@+id/etPassword"
+      android:layout_alignParentLeft="true"
+      android:layout_alignParentStart="true"
+      android:layout_marginTop="80dp"
+      android:layout_marginLeft="20dp"
+      android:layout_marginRight="190dp"
+      android:text="REVOKE KEY" />
 
   <Button
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:text="REGISTER"
-    android:id="@+id/bNext"
+    android:id="@+id/bRegister"
     android:background="#66ba6a"
     android:textColor="#FFFFFF"
-    android:layout_alignTop="@+id/bAdvanced"
-    android:layout_alignRight="@+id/etPassword"
-    android:layout_alignEnd="@+id/etPassword" />
+      android:layout_alignBaseline="@+id/bRevoke"
+      android:layout_alignBottom="@+id/bRevoke"
+      android:layout_alignParentRight="true"
+      android:layout_alignParentEnd="true"
+      android:layout_marginRight="20dp"
+      android:layout_marginLeft="190dp" />
 
 
 </RelativeLayout>

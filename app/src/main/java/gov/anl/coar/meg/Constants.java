@@ -8,8 +8,6 @@ public class Constants {
     public static final boolean DEBUG = true;
     public static final String TAG = "MEG";
 
-    public static final String LOGIN_BUT_NO_KEY = "It seems like you still need to complete the MEG installation step";
-
     public static final int ENCRYPTION_BITS = 2048;
     public static final String RSA = "RSA";
     public static final String SPONGY_CASTLE = "SC";
@@ -20,6 +18,8 @@ public class Constants {
     public static final String REVOCATIONKEY_FILENAME = "revocation.asc";
     public static final String PHONENUMBER_FILENAME = "phone_number.txt";
     public static final String EMAIL_FILENAME = "email.txt";
+    public static final String FIRSTNAME_FILENAME = "first_name.txt";
+    public static final String LASTNAME_FILENAME = "last_name.txt";
 
     public static final int IO_BUFFER_SIZE = 102400;
 

@@ -3,19 +3,24 @@ package gov.anl.coar.meg;
 import android.*;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -54,6 +59,8 @@ public class MainActivity extends FragmentActivity
     Intent mInstanceIdIntent;
     MEGResultReceiver mReceiver;
 
+    BroadcastReceiver receiver;
+
     /**	Instantiate bInstall and bLogin buttons
      *
      * 	@author Bridget Basan
@@ -77,6 +84,14 @@ public class MainActivity extends FragmentActivity
         imgCheck = (ImageView) findViewById(R.id.imgCheck);
         setImgCheckVisibility();
 
+        //Create a receiver to reset login
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                setImgCheckVisibility();
+            }
+        };
+
         if (checkPlayServices()) {
             mReceiver = new MEGResultReceiver(new Handler());
             mReceiver.setReceiver(this);
@@ -88,6 +103,27 @@ public class MainActivity extends FragmentActivity
         }
 
         requestCameraPermissions();
+    }
+
+    //Refresh the logged in button and check every time we view the activity
+    @Override
+    public void onResume() {
+        super.onResume();
+        setImgCheckVisibility();
+    }
+
+    //Register the receiver on start
+    @Override
+    protected void onStart() {
+        super.onStart();
+        LocalBroadcastManager.getInstance(this).registerReceiver((receiver), new IntentFilter("keyHasBeenRevoked"));
+    }
+
+    //Unregister the receiver on stop
+    @Override
+    protected void onStop() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
+        super.onStop();
     }
 
     /** Instantiate new intents on button clicks
@@ -104,7 +140,7 @@ public class MainActivity extends FragmentActivity
             case R.id.bLogin:
                 PrivateKeyCache cache = (PrivateKeyCache) getApplication();
                 if (!new Util().doesSecretKeyExist(this)) {
-                    bLogin.setError(Constants.LOGIN_BUT_NO_KEY);
+                    Toast.makeText(getApplicationContext(), "You must register first", Toast.LENGTH_SHORT).show();
                 } else if (cache.needsRefresh()) {
                     FragmentManager fm = getFragmentManager();
                     EnterPasswordDialog epd = new EnterPasswordDialog();
@@ -190,7 +226,7 @@ public class MainActivity extends FragmentActivity
         //Check if the private key needs to be unlocked and set the clickability
         //of the button and the indicator visiblity appropriately
         PrivateKeyCache cache = (PrivateKeyCache) getApplication();
-        if (cache.needsRefresh()) {
+        if (!new Util().doesSecretKeyExist(this) || cache.needsRefresh()) {
             imgCheck.setVisibility(View.INVISIBLE);
             bLogin.setClickable(true);
             bLogin.setText("LOG IN");

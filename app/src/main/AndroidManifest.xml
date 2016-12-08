@@ -42,9 +42,6 @@
             android:name=".Installation"
             android:label="@string/title_activity_installation" />
         <activity
-            android:name=".Advanced_Options"
-            android:label="@string/title_activity_advanced__options" />
-        <activity
             android:name=".Login"
             android:label="Login"
             android:screenOrientation="portrait" />

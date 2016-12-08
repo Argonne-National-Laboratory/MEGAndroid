@@ -36,11 +36,14 @@ public class Util {
     ) {
         new File(context.getFilesDir(), Constants.PHONENUMBER_FILENAME).delete();
         new File(context.getFilesDir(), Constants.EMAIL_FILENAME).delete();
+        new File(context.getFilesDir(), Constants.FIRSTNAME_FILENAME).delete();
+        new File(context.getFilesDir(), Constants.LASTNAME_FILENAME).delete();
         new File(context.getFilesDir(), Constants.PUBLICKEYRING_FILENAME).delete();
         new File(context.getFilesDir(), Constants.SECRETKEYRING_FILENAME).delete();
         new File(context.getFilesDir(), Constants.REVOCATIONKEY_FILENAME).delete();
         new File(context.getFilesDir(), Constants.SECRETKEYRING_FILENAME).delete();
         new File(context.getFilesDir(), Constants.SYMMETRICKEY_META_FILENAME).delete();
+        removeAESKeys(context);
     }
 
     /**
@@ -256,7 +259,7 @@ public class Util {
         }
     }
 
-    public static void removeAESKey(Context context) {
+    public static void removeAESKeys(Context context) {
         // This is a debug method and as such I'm not going to put much work into it.
         try {
             File[] files = context.getFilesDir().listFiles();

@@ -1,6 +1,8 @@
 package gov.anl.coar.meg.service;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GcmListenerService;
@@ -13,6 +15,14 @@ import gov.anl.coar.meg.pgp.MEGMessage;
  */
 public class GCMListenerService extends GcmListenerService {
     private static final String TAG = "GCMListenerService";
+
+    LocalBroadcastManager broadcaster = LocalBroadcastManager.getInstance(this);
+
+    //Broadcast to views that we've revoked the keys
+    public void sendResult() {
+        Intent i = new Intent("keyHasBeenRevoked");
+        broadcaster.sendBroadcast(i);
+    }
 
     @Override
     public void onMessageReceived(
@@ -39,6 +49,9 @@ public class GCMListenerService extends GcmListenerService {
             }
             else if (action.contains("revoke")) {
                 Util.deleteAllFiles(this);
+                sendResult();
+                Log.d("GCMListener", "sent result");
+
             }
         } catch (Exception e) {
             e.printStackTrace();
