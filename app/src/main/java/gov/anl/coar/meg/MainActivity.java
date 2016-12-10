@@ -54,8 +54,6 @@ public class MainActivity extends FragmentActivity
 
     Button bInstall;
     Button bLogin;
-    Button bScan;
-    ImageView imgCheck;
     Intent mInstanceIdIntent;
     MEGResultReceiver mReceiver;
 
@@ -78,17 +76,11 @@ public class MainActivity extends FragmentActivity
         bLogin = (Button) findViewById(R.id.bLogin);
         bLogin.setOnClickListener(this);
 
-        bScan = (Button) findViewById(R.id.bScan);
-        bScan.setOnClickListener(this);
-
-        imgCheck = (ImageView) findViewById(R.id.imgCheck);
-        setImgCheckVisibility();
-
         //Create a receiver to reset login
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                setImgCheckVisibility();
+                //setImgCheckVisibility();
             }
         };
 
@@ -105,11 +97,13 @@ public class MainActivity extends FragmentActivity
         requestCameraPermissions();
     }
 
-    //Refresh the logged in button and check every time we view the activity
+    //If we're logged in, move on to logged in page automatically
     @Override
     public void onResume() {
         super.onResume();
-        setImgCheckVisibility();
+        if (isKeyUnlocked()) {
+            startActivity(new Intent(this, Login.class));
+        }
     }
 
     //Register the receiver on start
@@ -151,8 +145,6 @@ public class MainActivity extends FragmentActivity
                     //startActivity(new Intent(this, Login.class));
                 }
                 break;
-            case R.id.bScan:
-                startActivity(new Intent(this, QRManageActivity.class));
             default:
                 break;
         }
@@ -222,22 +214,11 @@ public class MainActivity extends FragmentActivity
         }
     }
 
-    protected void setImgCheckVisibility() {
-        //Check if the private key needs to be unlocked and set the clickability
-        //of the button and the indicator visiblity appropriately
+    protected boolean isKeyUnlocked() {
         PrivateKeyCache cache = (PrivateKeyCache) getApplication();
         if (!new Util().doesSecretKeyExist(this) || cache.needsRefresh()) {
-            imgCheck.setVisibility(View.INVISIBLE);
-            bLogin.setClickable(true);
-            bLogin.setText("LOG IN");
-            bLogin.setBackgroundColor(Color.parseColor("#66ba6a"));
+            return false;
         }
-        else {
-            imgCheck.setVisibility(View.VISIBLE);
-            bLogin.setClickable(false);
-            bLogin.setText("LOGGED IN");
-            bLogin.setBackgroundColor(Color.GRAY);
-
-        }
+        return true;
     }
 }

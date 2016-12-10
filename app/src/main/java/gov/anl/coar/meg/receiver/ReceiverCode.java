@@ -10,4 +10,6 @@ public class ReceiverCode {
     public static final int IID_CODE_MEGSERVER_FAILURE = 3;
     public static final int IID_NO_PUBLIC_KEY_FAILURE = 4;
     public static final int IID_APP_FAILURE = 5;
+    public static final int IID_CODE_CONNECTED = 6;
+    public static final int IID_CODE_DISCONNECTED = 7;
 }

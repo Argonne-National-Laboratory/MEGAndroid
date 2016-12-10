@@ -42,8 +42,8 @@ public class EnterPasswordDialog extends DialogFragment{
 
                             //Make sure calling activity is MainActivity
                             if (getActivity() instanceof MainActivity)
-                                //So we can disable the login button and show the logged in indicator
-                                ((MainActivity)getActivity()).setImgCheckVisibility();
+                                //So we can send ourselves to the logged in screen when we dismiss this fragment
+                                ((MainActivity)getActivity()).onResume();
 
                             //If there isn't any symmetric keys, ask to scan the first one
                             if (!Util.doesSymmetricKeyExist((getActivity()).getApplicationContext())) {

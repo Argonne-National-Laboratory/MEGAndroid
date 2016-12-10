@@ -44,7 +44,8 @@
       android:layout_below="@+id/textView"
       android:layout_alignLeft="@+id/bInstall"
       android:layout_alignStart="@+id/bInstall"
-      android:layout_marginRight="200dp" />
+      android:layout_alignRight="@+id/bInstall"
+      android:layout_alignEnd="@+id/bInstall" />
 
 
   <Button
@@ -59,34 +60,5 @@
     android:layout_marginRight="40dp"
     android:layout_centerHorizontal="true"
       android:focusableInTouchMode="false" />
-
-  <Button
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:text="QR Codes"
-      android:id="@+id/bScan"
-      android:background="#66ba6a"
-      android:textColor="#FFFFFF"
-      android:focusable="false"
-      android:layout_below="@+id/textView"
-      android:layout_alignRight="@+id/bInstall"
-      android:layout_alignEnd="@+id/bInstall"
-      android:layout_marginLeft="200dp" />
-
-  <ImageView
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:id="@+id/imgCheck"
-      android:paddingEnd="8dp"
-      android:paddingRight="8dp"
-      android:visibility="visible"
-      android:adjustViewBounds="true"
-      android:cropToPadding="true"
-      android:scaleType="fitCenter"
-      android:src="@drawable/check"
-      android:layout_toLeftOf="@+id/bLogin"
-      android:layout_toStartOf="@+id/bLogin"
-      android:layout_alignTop="@+id/bLogin"
-      android:layout_alignBottom="@+id/bLogin" />
 
 </RelativeLayout>

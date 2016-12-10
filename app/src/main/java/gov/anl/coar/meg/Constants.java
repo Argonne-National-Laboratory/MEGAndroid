@@ -44,4 +44,6 @@ public class Constants {
 
     public static final String ALERT_MESSAGE_KEY = "alertMessage";
     public static final String RECEIVER_KEY = "receiver";
+
+    public static final int WIFI_STATUS_POLL_MS = 3000;
 }
