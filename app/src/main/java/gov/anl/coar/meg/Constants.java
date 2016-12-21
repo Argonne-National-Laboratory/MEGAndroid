@@ -20,6 +20,11 @@ public class Constants {
     public static final String EMAIL_FILENAME = "email.txt";
     public static final String FIRSTNAME_FILENAME = "first_name.txt";
     public static final String LASTNAME_FILENAME = "last_name.txt";
+    public static final String MEG_SERVER_FILENAME = "server_addr.txt";
+    public static final String UPDATE_INTERVAL_FILENAME = "update_interval.txt";
+    public static final String SYNC_CONTACTS_FILENAME = "sync_contacts.txt";
+    public static final String UPDATE_ON_WIFI_FILENAME = "update_on_wifi.txt";
+    public static final String OOB_FILENAME = "oob.txt";
 
     public static final int IO_BUFFER_SIZE = 102400;
 

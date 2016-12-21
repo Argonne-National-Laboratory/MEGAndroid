@@ -21,6 +21,8 @@
     <string name="cancel">Cancel</string>
     <string name="password">password</string>
     <string name="retry">Retry</string>
+    <string name="revoke_key">Revoke Key</string>
+    <string name="register">Register</string>
     <string name="incorrect_password_msg">The entered password was incorrect. Retry or Quit?</string>
     <string name="something_wrong_server_msg">Something went wrong with the request. Try again</string>
     <string name="no_key_to_revoke_msg">There is no key to revoke! Create one first.</string>

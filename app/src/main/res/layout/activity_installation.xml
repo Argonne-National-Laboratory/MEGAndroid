@@ -114,27 +114,27 @@
       android:id="@+id/bRevoke"
     android:background="#FF0000"
     android:textColor="#FFFFFF"
-      android:layout_below="@+id/etPassword"
+      android:text="@string/revoke_key"
+      android:layout_alignParentBottom="true"
       android:layout_alignParentLeft="true"
       android:layout_alignParentStart="true"
-      android:layout_marginTop="80dp"
+      android:layout_marginRight="200dp"
       android:layout_marginLeft="20dp"
-      android:layout_marginRight="190dp"
-      android:text="REVOKE KEY" />
+      android:layout_marginBottom="20dp" />
 
   <Button
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:text="REGISTER"
+    android:text="@string/register"
     android:id="@+id/bRegister"
     android:background="#66ba6a"
     android:textColor="#FFFFFF"
-      android:layout_alignBaseline="@+id/bRevoke"
-      android:layout_alignBottom="@+id/bRevoke"
+      android:layout_alignParentBottom="true"
       android:layout_alignParentRight="true"
       android:layout_alignParentEnd="true"
+      android:layout_marginLeft="200dp"
       android:layout_marginRight="20dp"
-      android:layout_marginLeft="190dp" />
+      android:layout_marginBottom="20dp" />
 
 
 </RelativeLayout>

@@ -90,6 +90,22 @@ public class Util {
         return false;
     }
 
+    public static boolean doesConfigFileExist(
+            Context context,
+            String configFileName
+    ) {
+        try {
+            File[] files = context.getFilesDir().listFiles();
+            for (int i = 0; i < files.length; i++) {
+                if (files[i].getName().contains(configFileName))
+                {
+                    return true;
+                }
+            }
+        } catch (Exception e) {}
+        return false;
+    }
+
     public static void writeConfigVarToFile(Context context, String filename, String item) {
         try {
             File varFile = new File(context.getFilesDir(), filename);

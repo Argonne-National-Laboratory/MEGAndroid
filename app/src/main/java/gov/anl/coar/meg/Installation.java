@@ -94,6 +94,9 @@ public class Installation extends AppCompatActivity
                 fillRegistrationInfo();
             }
         };
+
+        //Fill with initial config settings on fresh install
+        createInitialAdvConfigOptions();
     }
 
     //Refresh the registration info every time we come back to the activity
@@ -164,6 +167,20 @@ public class Installation extends AppCompatActivity
 
         //Disable another registration
 
+    }
+
+    //Create config files if they don't exist
+    private void createInitialAdvConfigOptions() {
+        if (!Util.doesConfigFileExist(getApplicationContext(), Constants.MEG_SERVER_FILENAME))
+            Util.writeConfigVarToFile(getApplicationContext(), Constants.MEG_SERVER_FILENAME, Constants.MEG_API_URL);;
+        if (!Util.doesConfigFileExist(getApplicationContext(), Constants.UPDATE_INTERVAL_FILENAME))
+            Util.writeConfigVarToFile(getApplicationContext(), Constants.UPDATE_INTERVAL_FILENAME, String.valueOf(R.id.m30minutes));
+        if (!Util.doesConfigFileExist(getApplicationContext(), Constants.SYNC_CONTACTS_FILENAME))
+            Util.writeConfigVarToFile(getApplicationContext(), Constants.SYNC_CONTACTS_FILENAME, String.valueOf(true));
+        if (!Util.doesConfigFileExist(getApplicationContext(), Constants.UPDATE_ON_WIFI_FILENAME))
+            Util.writeConfigVarToFile(getApplicationContext(), Constants.UPDATE_ON_WIFI_FILENAME, String.valueOf(true));
+        if (!Util.doesConfigFileExist(getApplicationContext(), Constants.OOB_FILENAME))
+            Util.writeConfigVarToFile(getApplicationContext(), Constants.OOB_FILENAME, String.valueOf(true));
     }
 
     /**
