@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="gov.anl.coar.meg.AdvancedOptions">
+    <item android:id="@+id/m5minutes" android:title="@string/menu_item_5_minutes"
+        android:orderInCategory="100" app:showAsAction="never" />
+    <item android:id="@+id/m10minutes" android:title="@string/menu_item_10_minutes"
+        android:orderInCategory="200" app:showAsAction="never" />
+    <item android:id="@+id/m30minutes" android:title="@string/menu_item_30_minutes"
+        android:orderInCategory="300" app:showAsAction="never" />
+</menu>

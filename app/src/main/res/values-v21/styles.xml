@@ -6,4 +6,19 @@
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
+
+    <style name="MEG_Theme" parent="AppTheme">
+        <item name="colorPrimary">@color/MEG_Green</item>
+        <item name="android:textColorSecondary">@color/MEG_Green</item>
+        <item name="android:colorForeground">@color/MEG_Green</item>
+        <item name="android:navigationBarColor">@color/MEG_Green</item>
+        <item name="colorAccent">@color/MEG_Green</item>
+    </style>
+
+    <style name="MEG_Theme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
 </resources>

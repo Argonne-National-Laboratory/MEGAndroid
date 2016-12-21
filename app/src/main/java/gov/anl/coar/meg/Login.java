@@ -38,6 +38,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Re
     TextView tvStatus;
     TextView tvNetworkName;
     ImageView imgLock;
+    //MenuItem mRegistrationSettings;
 
     Intent mWifiStatusIntent;
     MEGResultReceiver mReceiver;
@@ -118,6 +119,21 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Re
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_login, menu);
+//        MenuItem item = menu.findItem(R.id.mRegistrationSettings);
+//        item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+//            @Override
+//            public boolean onMenuItemClick(MenuItem m) {
+//                Log.d("Login", Integer.toString(m.getItemId()));
+//                switch(m.getItemId()) {
+//                    case R.id.mRegistrationSettings:
+//                        startActivity(new Intent(getApplicationContext(), Installation.class));
+//                        break;
+//                    default:
+//                        break;
+//                }
+//                return true;
+//            }
+//        });
         return true;
     }
 
@@ -130,7 +146,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Re
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.mRegistrationSettings) {
+            startActivity(new Intent(getApplicationContext(), Installation.class));
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -147,7 +164,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener, Re
     public void onClick(View v) {
         switch(v.getId()){
             case R.id.bQRCode:
-                startActivity(new Intent(this,QRManageActivity.class));
+                startActivity(new Intent(this, QRManageActivity.class));
                 break;
             default:
                 break;

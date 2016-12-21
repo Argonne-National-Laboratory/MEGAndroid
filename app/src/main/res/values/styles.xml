@@ -14,6 +14,23 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="MEG_Theme" parent="Theme.AppCompat">
+        <item name="colorPrimary">@color/MEG_Green</item>
+        <item name="android:textColorSecondary">@color/MEG_Green</item>
+        <item name="android:colorForeground">@color/MEG_Green</item>
+        <item name="colorAccent">@color/MEG_Green</item>
+    </style>
+
     <color name="MEG_Green">#66ba6a</color>
+    <color name="MEG_Green_2">#66ba6a</color>
+
+    <style name="MEG_Theme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="MEG_Theme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="MEG_Theme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 </resources>
