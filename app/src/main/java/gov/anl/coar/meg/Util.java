@@ -90,6 +90,18 @@ public class Util {
         return false;
     }
 
+    public static void writeConfigVarToFile(Context context, String filename, String item) {
+        try {
+            File varFile = new File(context.getFilesDir(), filename);
+            PrintWriter output = new PrintWriter(varFile);
+            output.write(item);
+            output.close();
+        } catch (FileNotFoundException e) {
+            // Once again kick handling this down the line
+            e.printStackTrace();
+        }
+    }
+
     public static String getConfigVar(Context context, String varFilename) {
         try {
             File phoneNumberFile = new File(context.getFilesDir(), varFilename);

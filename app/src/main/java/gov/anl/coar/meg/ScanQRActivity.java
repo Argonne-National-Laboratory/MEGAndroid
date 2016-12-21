@@ -16,6 +16,7 @@ import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.PreviewCallback;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.util.Log;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -96,6 +97,7 @@ public class ScanQRActivity extends Activity{
     private Runnable doAutoFocus = new Runnable() {
         public void run() {
             if (previewing)
+                SystemClock.sleep(1000);
                 mCamera.autoFocus(autoFocusCB);
         }
     };

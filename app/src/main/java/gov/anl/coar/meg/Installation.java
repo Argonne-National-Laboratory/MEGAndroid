@@ -166,18 +166,6 @@ public class Installation extends AppCompatActivity
 
     }
 
-    public void writeConfigVarToFile(String filename, String item) {
-        try {
-            File varFile = new File(this.getFilesDir(), filename);
-            PrintWriter output = new PrintWriter(varFile);
-            output.write(item);
-            output.close();
-        } catch (FileNotFoundException e) {
-            // Once again kick handling this down the line
-            e.printStackTrace();
-        }
-    }
-
     /**
      * Return AlertDialog to tell the user they already created their PGP key
      *
@@ -284,10 +272,10 @@ public class Installation extends AppCompatActivity
         char[] password = etPassword.getText().toString().toCharArray();
 
         //Save the information to files
-        writeConfigVarToFile(Constants.FIRSTNAME_FILENAME, firstName);
-        writeConfigVarToFile(Constants.LASTNAME_FILENAME, lastName);
-        writeConfigVarToFile(Constants.PHONENUMBER_FILENAME, phoneNumber);
-        writeConfigVarToFile(Constants.EMAIL_FILENAME, email);
+        Util.writeConfigVarToFile(getApplicationContext(), Constants.FIRSTNAME_FILENAME, firstName);
+        Util.writeConfigVarToFile(getApplicationContext(), Constants.LASTNAME_FILENAME, lastName);
+        Util.writeConfigVarToFile(getApplicationContext(), Constants.PHONENUMBER_FILENAME, phoneNumber);
+        Util.writeConfigVarToFile(getApplicationContext(), Constants.EMAIL_FILENAME, email);
 
         //Create keys with the info
         KeyGenerationLogic keyGeneration = new KeyGenerationLogic();

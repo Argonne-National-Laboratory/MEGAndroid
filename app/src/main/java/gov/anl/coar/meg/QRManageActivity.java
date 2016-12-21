@@ -29,7 +29,9 @@ public class QRManageActivity extends AppCompatActivity implements ListView.OnIt
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         //Get intent info and check if it holds the clientID coming from a scan
-        Bundle scanInfo = data.getExtras();
+        Bundle scanInfo = null;
+        if (data != null)
+            scanInfo = data.getExtras();
 
         try {
             if (scanInfo != null && scanInfo.getString("action").toString().equals("nameClientKey")) {
