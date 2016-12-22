@@ -1,5 +1,6 @@
 package gov.anl.coar.meg.http;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.util.Log;
@@ -13,6 +14,7 @@ import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import gov.anl.coar.meg.Constants;
+import gov.anl.coar.meg.Util;
 import gov.anl.coar.meg.receiver.ReceiverCode;
 
 /**
@@ -20,7 +22,6 @@ import gov.anl.coar.meg.receiver.ReceiverCode;
  */
 public class MEGServerRequest {
     private final String TAG = "MEGServerRequest";
-    private final String mServerUrl = Constants.MEG_API_URL;
 
     private static final String ADD_PUBLIC_KEY_URL = "/addkey/";
     private static final String ENCRYPTED_MSG_URL = "/encrypted_message/";
@@ -35,13 +36,19 @@ public class MEGServerRequest {
     private int mMaxRetries = Constants.HTTP_MAX_RETRIES;
     private long mRetryTimeout = Constants.HTTP_RETRY_TIMEOUT;
 
+    private Context mContext;
+
+    public MEGServerRequest(Context context) {
+        mContext = context;
+    }
+
     public JSONObject getDecryptedMessage(
             String messageId
     )
         throws Exception
     {
         mCurRetries = 0;
-        return getMessage(mServerUrl + DECRYPTED_MSG_URL, messageId);
+        return getMessage(Util.getConfigVar(mContext, Constants.MEG_SERVER_FILENAME) + DECRYPTED_MSG_URL, messageId);
     }
 
     public JSONObject getEncryptedMessage(
@@ -50,7 +57,7 @@ public class MEGServerRequest {
             throws Exception
     {
         mCurRetries = 0;
-        return getMessage(mServerUrl + ENCRYPTED_MSG_URL, messageId);
+        return getMessage(Util.getConfigVar(mContext, Constants.MEG_SERVER_FILENAME) + ENCRYPTED_MSG_URL, messageId);
     }
 
     public void putEncryptedMessage(
@@ -62,7 +69,7 @@ public class MEGServerRequest {
             throws Exception
     {
         mCurRetries = 0;
-        putMessage(mServerUrl + ENCRYPTED_MSG_URL, email_to, email_from, message_id, inBuffer);
+        putMessage(Util.getConfigVar(mContext, Constants.MEG_SERVER_FILENAME) + ENCRYPTED_MSG_URL, email_to, email_from, message_id, inBuffer);
     }
 
     public void putDecryptedMessage(
@@ -74,7 +81,7 @@ public class MEGServerRequest {
             throws Exception
     {
         mCurRetries = 0;
-        putMessage(mServerUrl + DECRYPTED_MSG_URL, email_to, email_from, message_id, inBuffer);
+        putMessage(Util.getConfigVar(mContext, Constants.MEG_SERVER_FILENAME) + DECRYPTED_MSG_URL, email_to, email_from, message_id, inBuffer);
     }
 
     private void putMessage(
@@ -137,7 +144,7 @@ public class MEGServerRequest {
     )
             throws Exception
     {
-        String url = Constants.MEG_API_URL + STORE_INSTANCE_ID_API_ROUTE;
+        String url = Util.getConfigVar(mContext, Constants.MEG_SERVER_FILENAME) + STORE_INSTANCE_ID_API_ROUTE;
         HashMap<String, String> data = new HashMap<String, String>();
         data.put("gcm_instance_id", token);
         data.put("phone_number", phoneNumber);
@@ -162,7 +169,7 @@ public class MEGServerRequest {
             throws Exception
     {
         try {
-            String url = Constants.MEG_API_URL + ADD_PUBLIC_KEY_URL;
+            String url = Util.getConfigVar(mContext, Constants.MEG_SERVER_FILENAME) + ADD_PUBLIC_KEY_URL;
             Log.d(TAG, "Register public key with meg url:  " + url);
             HashMap<String, String> data = new HashMap<String, String>();
             data.put("keydata", publicKeyText);
@@ -180,7 +187,7 @@ public class MEGServerRequest {
             throws Exception
     {
         try {
-            String revocationUrl = Constants.MEG_API_URL + STORE_REVOCATION_URL;
+            String revocationUrl = Util.getConfigVar(mContext, Constants.MEG_SERVER_FILENAME) + STORE_REVOCATION_URL;
             Log.d(TAG, "Register revocation key at url: " + revocationUrl);
             HashMap<String, String> revocationData = new HashMap<String, String>();
             revocationData.put("keydata", revocationKeyText);
@@ -198,7 +205,7 @@ public class MEGServerRequest {
             throws Exception
     {
         keyId = cutKeyId(keyId);
-        String url = mServerUrl + GET_KEY_URL + keyId;
+        String url = Util.getConfigVar(mContext, Constants.MEG_SERVER_FILENAME) + GET_KEY_URL + keyId;
         Log.d(TAG, "Get public key by id: " + keyId);
         try {
             HttpRequest response = HttpRequest.get(url);
@@ -218,7 +225,7 @@ public class MEGServerRequest {
     )
             throws Exception
     {
-        String url = mServerUrl + GET_KEY_BY_MSG_ID_URL;
+        String url = Util.getConfigVar(mContext, Constants.MEG_SERVER_FILENAME) + GET_KEY_BY_MSG_ID_URL;
         Log.d(TAG, "Get associated public key for message: " + messageId);
         try {
             HttpRequest response = HttpRequest.get(url, true, "associated_message_id", messageId);
@@ -239,7 +246,7 @@ public class MEGServerRequest {
             throws Exception
     {
         keyId = cutKeyId(keyId);
-        String url = mServerUrl + REVOKE_KEY_URL;
+        String url = Util.getConfigVar(mContext, Constants.MEG_SERVER_FILENAME) + REVOKE_KEY_URL;
         Log.d(TAG, "Request revoke for key id: " + keyId);
         try {
             HttpRequest response = HttpRequest.post(url, true, "keyid", keyId);

@@ -42,7 +42,7 @@ public class KeyRevocationService extends IntentService {
             result.send(ReceiverCode.IID_NO_PUBLIC_KEY_FAILURE, bundle);
             return;
         }
-        MEGServerRequest request = new MEGServerRequest();
+        MEGServerRequest request = new MEGServerRequest(getApplicationContext());
         try {
             request.revokeKey(keyId);
         } catch (Exception e) {

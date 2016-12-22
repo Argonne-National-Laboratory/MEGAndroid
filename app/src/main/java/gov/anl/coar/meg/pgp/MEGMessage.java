@@ -86,7 +86,7 @@ public class MEGMessage {
     )
             throws Exception
     {
-        MEGServerRequest request = new MEGServerRequest();
+        MEGServerRequest request = new MEGServerRequest(context);
 
         //Get public key to encrypt with
         InputStream pubkeyStream = request.getAssociatedPublicKey(messageId);
@@ -119,7 +119,7 @@ public class MEGMessage {
     )
             throws Exception
     {
-        MEGServerRequest request = new MEGServerRequest();
+        MEGServerRequest request = new MEGServerRequest(context);
         JSONObject getResponse = request.getDecryptedMessage(messageId);
         String message = getResponse.getString("message");
         String emailFrom = getResponse.getString("email_from");

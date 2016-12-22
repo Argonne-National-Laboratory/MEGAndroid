@@ -50,9 +50,10 @@ public class GCMInstanceIdRegistrationService extends IntentService{
             String token = instanceID.getToken(
                     getString(R.string.gcm_defaultSenderId), GoogleCloudMessaging.INSTANCE_ID_SCOPE, null
             );
+            Log.d(TAG, String.valueOf(R.string.gcm_defaultSenderId));
             Log.d(TAG, "Received token " + token);
             // send the token to the server for storage
-            MEGServerRequest request = new MEGServerRequest();
+            MEGServerRequest request = new MEGServerRequest(getApplicationContext());
             request.putToken(result, bundle, token, phoneNumber, email);
         } catch (Exception e) {
             handleException(e, bundle, result);

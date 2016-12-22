@@ -18,6 +18,7 @@ import gov.anl.coar.meg.receiver.ReceiverCode;
 
 /**
  * Created by greg on 4/4/16.
+ * Edited by Joshua Lyle on 12/21/16
  */
 public class KeyRegistrationService extends IntentService{
     public static final String TAG = "KeyRegistrationService";
@@ -32,7 +33,7 @@ public class KeyRegistrationService extends IntentService{
     ) {
         Bundle bundle = new Bundle();
         ResultReceiver result = intent.getParcelableExtra("receiver");
-        MEGServerRequest megServerRequest = new MEGServerRequest();
+        MEGServerRequest megServerRequest = new MEGServerRequest(getApplicationContext());
         try {
             if (!Util.doesPublicKeyExist(this)) {
                 result.send(ReceiverCode.IID_NO_PUBLIC_KEY_FAILURE, bundle);
