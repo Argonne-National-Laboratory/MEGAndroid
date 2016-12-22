@@ -22,7 +22,7 @@
     </style>
 
     <color name="MEG_Green">#66ba6a</color>
-    <color name="MEG_Green_2">#66ba6a</color>
+    <color name="MEG_Green_Dark">#00796B</color>
 
     <style name="MEG_Theme.NoActionBar">
         <item name="windowActionBar">false</item>

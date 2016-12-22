@@ -13,7 +13,7 @@
         <item name="android:colorForeground">@color/MEG_Green</item>
         <item name="android:navigationBarColor">@color/MEG_Green</item>
         <item name="colorAccent">@color/MEG_Green</item>
-        <item name="android:statusBarColor">@color/MEG_Green</item>
+        <item name="android:statusBarColor">@color/MEG_Green_Dark</item>
     </style>
 
     <style name="MEG_Theme.NoActionBar">
